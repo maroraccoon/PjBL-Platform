@@ -1,0 +1,533 @@
+{
+  "meta": {
+    "eventSeq": 25,
+    "noteSeq": 4,
+    "revisionSeq": 3
+  },
+  "projects": [
+    {
+      "id": "project-1",
+      "name": "학교 공간 개선 프로젝트",
+      "topic": "학생들이 쉬는 시간을 더 잘 보낼 수 있는 학교 공간 만들기",
+      "teams": 4,
+      "createdBy": "system",
+      "createdAt": "2026-05-20T15:53:30.506Z"
+    },
+    {
+      "id": "project-2",
+      "name": "지역 문제 해결 프로젝트",
+      "topic": "우리 동네에서 발견한 불편함을 해결하는 서비스 제안",
+      "teams": 3,
+      "createdBy": "system",
+      "createdAt": "2026-05-20T15:53:30.506Z"
+    },
+    {
+      "id": "project-3",
+      "name": "친환경 생활 실천 프로젝트",
+      "topic": "교실에서 실천할 수 있는 자원 절약 방법 설계",
+      "teams": 5,
+      "createdBy": "system",
+      "createdAt": "2026-05-20T15:53:30.506Z"
+    }
+  ],
+  "states": {
+    "project-1": {
+      "notes": [
+        {
+          "id": "note-1",
+          "stage": "problem_exploration",
+          "mode": "divergence",
+          "author": "김민서",
+          "actorId": "stu-01",
+          "teamId": "Team A",
+          "text": "쉬는 시간에 앉아서 이야기할 수 있는 공간이 부족하다.",
+          "timestamp": "2026-05-21T13:53:30.506Z"
+        },
+        {
+          "id": "note-2",
+          "stage": "problem_exploration",
+          "mode": "divergence",
+          "author": "이준호",
+          "actorId": "stu-02",
+          "teamId": "Team A",
+          "text": "복도와 계단 주변에 학생들이 몰려 이동이 불편하다.",
+          "timestamp": "2026-05-21T13:59:30.506Z"
+        },
+        {
+          "id": "note-3",
+          "stage": "problem_exploration",
+          "mode": "convergence",
+          "author": "팀 합의",
+          "actorId": "stu-03",
+          "teamId": "Team A",
+          "text": "학생들이 짧은 쉬는 시간에 안전하게 머물 공간을 찾기 어렵다.",
+          "timestamp": "2026-05-21T14:08:30.506Z"
+        }
+      ],
+      "events": [
+        {
+          "eventId": "evt-0024",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team B",
+          "actorId": "stu-04",
+          "actorName": "최도윤",
+          "actorRole": "learner",
+          "eventType": "artifact_revision_event",
+          "cpsStage": "action_planning",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T15:50:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0023",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "stu-03",
+          "actorName": "박서연",
+          "actorRole": "learner",
+          "eventType": "idea_created",
+          "cpsStage": "action_planning",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T15:47:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0022",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "ai-01",
+          "actorName": "AI 팀원",
+          "actorRole": "ai_scaffold",
+          "eventType": "phase_switch",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-05-21T15:44:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0021",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "cps_stage_transition",
+          "cpsStage": "action_planning",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T15:41:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0020",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team B",
+          "actorId": "stu-04",
+          "actorName": "최도윤",
+          "actorRole": "learner",
+          "eventType": "ai_interaction_event",
+          "cpsStage": "action_planning",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T15:38:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0019",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "stu-03",
+          "actorName": "박서연",
+          "actorRole": "learner",
+          "eventType": "artifact_revision_event",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-05-21T15:35:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0018",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "idea_created",
+          "cpsStage": "solution_design",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T15:32:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0017",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "phase_switch",
+          "cpsStage": "solution_design",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T15:29:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0016",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team B",
+          "actorId": "stu-04",
+          "actorName": "최도윤",
+          "actorRole": "learner",
+          "eventType": "cps_stage_transition",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-05-21T15:26:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0015",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "ai-01",
+          "actorName": "AI 팀원",
+          "actorRole": "ai_scaffold",
+          "eventType": "ai_interaction_event",
+          "cpsStage": "solution_design",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T15:23:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0014",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "artifact_revision_event",
+          "cpsStage": "solution_design",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T15:20:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0013",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "idea_created",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-05-21T15:17:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0012",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team B",
+          "actorId": "stu-04",
+          "actorName": "최도윤",
+          "actorRole": "learner",
+          "eventType": "phase_switch",
+          "cpsStage": "idea_generation",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T15:14:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0011",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "stu-03",
+          "actorName": "박서연",
+          "actorRole": "learner",
+          "eventType": "cps_stage_transition",
+          "cpsStage": "idea_generation",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T15:11:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0010",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "ai_interaction_event",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-05-21T15:08:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0009",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "artifact_revision_event",
+          "cpsStage": "idea_generation",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T15:05:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0008",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team B",
+          "actorId": "ai-01",
+          "actorName": "AI 팀원",
+          "actorRole": "ai_scaffold",
+          "eventType": "idea_created",
+          "cpsStage": "idea_generation",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T15:02:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0007",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "stu-03",
+          "actorName": "박서연",
+          "actorRole": "learner",
+          "eventType": "phase_switch",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-05-21T14:59:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0006",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "cps_stage_transition",
+          "cpsStage": "problem_exploration",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T14:56:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0005",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "ai_interaction_event",
+          "cpsStage": "problem_exploration",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T14:53:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0004",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team B",
+          "actorId": "stu-04",
+          "actorName": "최도윤",
+          "actorRole": "learner",
+          "eventType": "artifact_revision_event",
+          "cpsStage": "problem_exploration",
+          "activityMode": "convergence",
+          "timestamp": "2026-05-21T14:50:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0003",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "stu-03",
+          "actorName": "박서연",
+          "actorRole": "learner",
+          "eventType": "idea_created",
+          "cpsStage": "problem_exploration",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T14:47:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0002",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "phase_switch",
+          "cpsStage": "problem_exploration",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T14:44:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        },
+        {
+          "eventId": "evt-0001",
+          "sessionId": "demo-session-2026-05-18",
+          "projectId": "project-1",
+          "teamId": "Team A",
+          "actorId": "ai-01",
+          "actorName": "AI 팀원",
+          "actorRole": "ai_scaffold",
+          "eventType": "cps_stage_transition",
+          "cpsStage": "problem_exploration",
+          "activityMode": "convergence",
+          "timestamp": "2026-05-21T14:41:30.506Z",
+          "payload": {
+            "mock": true
+          }
+        }
+      ],
+      "revisions": [
+        {
+          "version": "v0.3",
+          "by": "박서연",
+          "timestamp": "2026-05-21T14:33:30.506Z",
+          "delta": 27,
+          "title": "선택 기준 반영",
+          "note": "실행 가능성과 도움이 되는 정도를 기준으로 우선순위를 정했습니다.",
+          "type": "edit"
+        },
+        {
+          "version": "AI",
+          "by": "AI",
+          "timestamp": "2026-05-21T14:23:30.506Z",
+          "delta": 9,
+          "title": "힌트 제공",
+          "note": "관점 확장 질문을 제공했습니다.",
+          "type": "ai"
+        },
+        {
+          "version": "v0.2",
+          "by": "이준호",
+          "timestamp": "2026-05-21T14:13:30.506Z",
+          "delta": 34,
+          "title": "아이디어 묶기",
+          "note": "비슷한 아이디어를 세 가지 방향으로 묶었습니다.",
+          "type": "edit"
+        }
+      ],
+      "aiFeed": [
+        {
+          "by": "AI",
+          "text": "문제를 더 넓게 보려면 공간 부족, 이동 동선, 안전, 소음 관점을 나누어 살펴보세요.",
+          "timestamp": "2026-05-21T14:23:30.506Z"
+        }
+      ]
+    },
+    "project-2": {
+      "notes": [
+        {
+          "id": "note-4",
+          "stage": "problem_exploration",
+          "mode": "divergence",
+          "author": "김민서",
+          "actorId": "stu-01",
+          "teamId": "Team A",
+          "text": "생각 카드 테스트",
+          "timestamp": "2026-05-21T15:55:34.846Z",
+          "replies": []
+        }
+      ],
+      "events": [
+        {
+          "eventId": "evt-0025",
+          "sessionId": "session-project-2",
+          "projectId": "project-2",
+          "teamId": "Team A",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "idea_created",
+          "cpsStage": "problem_exploration",
+          "activityMode": "divergence",
+          "timestamp": "2026-05-21T15:55:34.846Z",
+          "payload": {
+            "noteId": "note-4",
+            "text": "생각 카드 테스트"
+          }
+        }
+      ],
+      "revisions": [],
+      "aiFeed": []
+    },
+    "project-3": {
+      "notes": [],
+      "events": [],
+      "revisions": [],
+      "aiFeed": []
+    }
+  }
+}

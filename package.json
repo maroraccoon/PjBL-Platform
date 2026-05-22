@@ -1,0 +1,12 @@
+{
+  "name": "pjbl-collaboration-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local-network PjBL collaboration demo with shared project state.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
