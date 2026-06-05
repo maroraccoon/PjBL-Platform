@@ -58,6 +58,7 @@ function normalizeStore(next) {
   next.meta = { eventSeq: 0, noteSeq: 0, revisionSeq: 0, ...(next.meta || {}) };
   next.projects ||= [];
   next.states ||= {};
+  next.users ||= [];
   next.projects.forEach((project) => {
     project.enrolledStudents ||= [];
     if (typeof project.visibleToAll !== 'boolean') project.visibleToAll = project.createdBy !== 'teacher';
@@ -80,6 +81,10 @@ function normalizeStore(next) {
 function saveStore(nextStore = store) {
   fs.mkdirSync(path.dirname(STORE_PATH), { recursive: true });
   fs.writeFileSync(STORE_PATH, JSON.stringify(nextStore, null, 2), 'utf8');
+}
+
+function allUsers() {
+  return [...demoUsers, ...(store.users || [])];
 }
 
 function createDefaultStore() {
@@ -127,7 +132,7 @@ function createDefaultStore() {
   };
   const fresh = { meta: { eventSeq: 0, noteSeq: seedNotes.length, revisionSeq: 4 }, projects, states: { 'project-1': state, 'project-2': emptyProjectState(), 'project-3': emptyProjectState() } };
   state.notes.forEach((note) => {
-    const user = demoUsers.find((u) => u.id === note.actorId) || demoUsers[1];
+    const user = allUsers().find((u) => u.id === note.actorId) || demoUsers[1];
     fresh.meta.eventSeq += 1;
     state.events.unshift({
       eventId: `evt-${String(fresh.meta.eventSeq).padStart(4, '0')}`,
@@ -277,10 +282,11 @@ function addEvent(projectId, user, eventType, cpsStage, activityMode, payload = 
 function buildState(projectId, viewer) {
   const project = store.projects.find((item) => item.id === projectId);
   const state = projectState(projectId);
+  const users = allUsers();
   const enrolled = project.visibleToAll
-    ? demoUsers.filter((user) => user.role === 'student').map((user) => user.id)
+    ? users.filter((user) => user.role === 'student').map((user) => user.id)
     : (project.enrolledStudents || []);
-  const students = demoUsers.filter((user) => user.role === 'student' && enrolled.includes(user.id));
+  const students = users.filter((user) => user.role === 'student' && enrolled.includes(user.id));
   const now = Date.now();
   const roster = students.map((student) => {
     const session = [...sessions.values()].find((item) => item.user.id === student.id && item.projectId === projectId);
@@ -320,7 +326,7 @@ function buildState(projectId, viewer) {
 function aiUsage(state, viewer, team) {
   const users = viewer.role === 'student'
     ? [viewer.id]
-    : demoUsers.filter((user) => user.role === 'student' && user.team === team).map((user) => user.id);
+    : allUsers().filter((user) => user.role === 'student' && user.team === team).map((user) => user.id);
   const byStage = Object.fromEntries(stages.map((stage) => [stage, 0]));
   state.events.forEach((event) => {
     if (event.eventType === 'ai_interaction_event' && users.includes(event.payload.requesterId || event.actorId)) {
@@ -417,11 +423,32 @@ async function handleApi(req, res, url) {
   try {
     if (req.method === 'POST' && url.pathname === '/api/login') {
       const body = await readBody(req);
-      const user = demoUsers.find((item) => item.username === body.username && item.password === body.password && item.role === body.role);
+      const user = allUsers().find((item) => item.username === body.username && item.password === body.password);
       if (!user) return sendJson(res, 401, { error: '데모 계정 정보가 올바르지 않습니다.' });
       const token = crypto.randomBytes(24).toString('hex');
       sessions.set(token, { token, user: publicUser(user), loginAt: Date.now(), lastSeen: Date.now(), projectId: null });
       return sendJson(res, 200, { token, user: publicUser(user) });
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/signup') {
+      const body = await readBody(req);
+      const username = String(body.username || '').trim();
+      const password = String(body.password || '').trim();
+      const name = String(body.name || username).trim();
+      if (!username || !password || !name) return sendJson(res, 400, { error: '이름, 아이디, 비밀번호를 모두 입력하세요.' });
+      if (allUsers().some((user) => user.username === username)) return sendJson(res, 409, { error: '이미 사용 중인 아이디입니다.' });
+      store.users ||= [];
+      const user = {
+        id: `stu-custom-${Date.now()}`,
+        username,
+        password,
+        role: 'student',
+        name,
+        team: '1조'
+      };
+      store.users.push(user);
+      saveStore();
+      return sendJson(res, 201, { user: publicUser(user) });
     }
 
     const session = requireSession(req, res, url);

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "eventSeq": 83,
+    "eventSeq": 89,
     "noteSeq": 15,
     "revisionSeq": 4
   },
@@ -235,6 +235,105 @@
         }
       ],
       "events": [
+        {
+          "eventId": "evt-0089",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "전체",
+          "actorId": "teacher-01",
+          "actorName": "김교수",
+          "actorRole": "instructor",
+          "eventType": "input_event",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T10:58:36.900Z",
+          "payload": {
+            "id": "loginPassword"
+          }
+        },
+        {
+          "eventId": "evt-0088",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T10:58:22.663Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0087",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T10:58:20.456Z",
+          "payload": {
+            "from": "solution_design",
+            "to": "action_planning"
+          }
+        },
+        {
+          "eventId": "evt-0086",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T10:58:19.775Z",
+          "payload": {
+            "from": "idea_generation",
+            "to": "solution_design"
+          }
+        },
+        {
+          "eventId": "evt-0085",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T10:58:19.136Z",
+          "payload": {
+            "from": "problem_exploration",
+            "to": "idea_generation"
+          }
+        },
+        {
+          "eventId": "evt-0084",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "problem_exploration",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T10:58:18.291Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
         {
           "eventId": "evt-0083",
           "sessionId": "session-project-1",
@@ -1766,5 +1865,6 @@
       "aiFeed": [],
       "decisions": {}
     }
-  }
+  },
+  "users": []
 }

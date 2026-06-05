@@ -68,14 +68,10 @@ document.addEventListener('DOMContentLoaded', () => {
     return data;
   }
 
-  function chooseRole(role) {
-    state.role = role;
-    $('loginRoleLabel').textContent = role === 'teacher' ? '교수자 로그인' : '학생 로그인';
-    $('loginHelp').textContent = role === 'teacher'
-      ? '교수자는 팀 진행 상황과 AI 사용 편향을 관찰합니다.'
-      : '학생은 프로젝트 단계별 발산/수렴 활동을 기록합니다.';
-    $('loginUsername').value = role === 'teacher' ? 'teacher' : 'minseo';
-    $('loginPassword').value = role === 'teacher' ? 'teacher123' : 'student123';
+  function openLogin() {
+    state.role = null;
+    $('loginUsername').value = '';
+    $('loginPassword').value = '';
     $('loginError').classList.add('hidden');
     showScreen('loginScreen');
   }
@@ -85,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await api('/api/login', {
         method: 'POST',
         body: JSON.stringify({
-          role: state.role,
           username: $('loginUsername').value.trim(),
           password: $('loginPassword').value
         })
@@ -98,6 +93,30 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
       $('loginError').textContent = error.message;
       $('loginError').classList.remove('hidden');
+    }
+  }
+
+  async function signup() {
+    const message = $('signupMessage');
+    try {
+      const data = await api('/api/signup', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: $('signupName').value.trim(),
+          username: $('signupUsername').value.trim(),
+          password: $('signupPassword').value
+        })
+      });
+      message.textContent = `${data.user.name} 계정이 생성되었습니다. 로그인 화면에서 접속하세요.`;
+      message.className = 'mt-4 rounded-2xl bg-teal/10 p-3 text-sm font-bold text-teal';
+      message.classList.remove('hidden');
+      $('signupName').value = '';
+      $('signupUsername').value = '';
+      $('signupPassword').value = '';
+    } catch (error) {
+      message.textContent = error.message;
+      message.className = 'mt-4 rounded-2xl bg-rose/10 p-3 text-sm font-bold text-rose';
+      message.classList.remove('hidden');
     }
   }
 
@@ -803,11 +822,18 @@ document.addEventListener('DOMContentLoaded', () => {
     return new Date(value).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', ...(seconds ? { second: '2-digit' } : {}) });
   }
 
-  document.querySelectorAll('[data-role-select]').forEach((button) => button.addEventListener('click', () => chooseRole(button.dataset.roleSelect)));
+  $('goLoginBtn').addEventListener('click', openLogin);
+  $('goSignupBtn').addEventListener('click', () => {
+    $('signupMessage').classList.add('hidden');
+    showScreen('signupScreen');
+  });
   $('backToRoleFromLogin').addEventListener('click', () => showScreen('roleScreen'));
+  $('backToRoleFromSignup').addEventListener('click', () => showScreen('roleScreen'));
   $('backToRole').addEventListener('click', () => showScreen('roleScreen'));
   $('loginBtn').addEventListener('click', login);
   $('loginPassword').addEventListener('keydown', (event) => { if (event.key === 'Enter') login(); });
+  $('signupBtn').addEventListener('click', signup);
+  $('signupPassword').addEventListener('keydown', (event) => { if (event.key === 'Enter') signup(); });
   $('createProjectBtn').addEventListener('click', () => $('createProjectPanel').classList.toggle('hidden'));
   $('saveProjectBtn').addEventListener('click', createProject);
   $('joinProjectBtn').addEventListener('click', joinProjectByCode);
