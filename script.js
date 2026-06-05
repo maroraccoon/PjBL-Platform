@@ -104,7 +104,9 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({
           name: $('signupName').value.trim(),
           username: $('signupUsername').value.trim(),
-          password: $('signupPassword').value
+          password: $('signupPassword').value,
+          role: $('signupRole').value,
+          teacherCode: $('signupTeacherCode').value.trim()
         })
       });
       message.textContent = `${data.user.name} 계정이 생성되었습니다. 로그인 화면에서 접속하세요.`;
@@ -113,6 +115,9 @@ document.addEventListener('DOMContentLoaded', () => {
       $('signupName').value = '';
       $('signupUsername').value = '';
       $('signupPassword').value = '';
+      $('signupTeacherCode').value = '';
+      $('signupRole').value = 'student';
+      toggleSignupTeacherCode();
     } catch (error) {
       message.textContent = error.message;
       message.className = 'mt-4 rounded-2xl bg-rose/10 p-3 text-sm font-bold text-rose';
@@ -833,6 +838,7 @@ document.addEventListener('DOMContentLoaded', () => {
   $('loginBtn').addEventListener('click', login);
   $('loginPassword').addEventListener('keydown', (event) => { if (event.key === 'Enter') login(); });
   $('signupBtn').addEventListener('click', signup);
+  $('signupRole').addEventListener('change', toggleSignupTeacherCode);
   $('signupPassword').addEventListener('keydown', (event) => { if (event.key === 'Enter') signup(); });
   $('createProjectBtn').addEventListener('click', () => $('createProjectPanel').classList.toggle('hidden'));
   $('saveProjectBtn').addEventListener('click', createProject);
@@ -927,6 +933,12 @@ document.addEventListener('DOMContentLoaded', () => {
       message.className = 'mt-3 text-sm font-bold text-rose';
       message.classList.remove('hidden');
     }
+  }
+
+  function toggleSignupTeacherCode() {
+    const isTeacher = $('signupRole').value === 'teacher';
+    $('signupTeacherCode').classList.toggle('hidden', !isTeacher);
+    if (!isTeacher) $('signupTeacherCode').value = '';
   }
 
   iconRefresh();

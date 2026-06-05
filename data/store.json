@@ -1,6 +1,6 @@
 {
   "meta": {
-    "eventSeq": 89,
+    "eventSeq": 98,
     "noteSeq": 15,
     "revisionSeq": 4
   },
@@ -235,6 +235,153 @@
         }
       ],
       "events": [
+        {
+          "eventId": "evt-0098",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T11:02:00.871Z",
+          "payload": {
+            "from": "solution_design",
+            "to": "action_planning"
+          }
+        },
+        {
+          "eventId": "evt-0097",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T11:01:59.908Z",
+          "payload": {
+            "from": "idea_generation",
+            "to": "solution_design"
+          }
+        },
+        {
+          "eventId": "evt-0096",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T11:01:51.408Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0095",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T11:01:49.472Z",
+          "payload": {
+            "from": "problem_exploration",
+            "to": "idea_generation"
+          }
+        },
+        {
+          "eventId": "evt-0094",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "problem_exploration",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T11:01:44.519Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0093",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-02",
+          "actorName": "이준호",
+          "actorRole": "learner",
+          "eventType": "input_event",
+          "cpsStage": "problem_exploration",
+          "activityMode": "divergence",
+          "timestamp": "2026-06-05T11:01:40.811Z",
+          "payload": {
+            "id": "loginPassword"
+          }
+        },
+        {
+          "eventId": "evt-0092",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "전체",
+          "actorId": "teacher-01",
+          "actorName": "김교수",
+          "actorRole": "instructor",
+          "eventType": "input_event",
+          "cpsStage": "problem_exploration",
+          "activityMode": "divergence",
+          "timestamp": "2026-06-05T11:01:36.063Z",
+          "payload": {
+            "id": "loginPassword"
+          }
+        },
+        {
+          "eventId": "evt-0091",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "전체",
+          "actorId": "teacher-01",
+          "actorName": "김교수",
+          "actorRole": "instructor",
+          "eventType": "input_event",
+          "cpsStage": "problem_exploration",
+          "activityMode": "divergence",
+          "timestamp": "2026-06-05T11:01:34.564Z",
+          "payload": {
+            "id": "loginPassword"
+          }
+        },
+        {
+          "eventId": "evt-0090",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "전체",
+          "actorId": "teacher-01",
+          "actorName": "김교수",
+          "actorRole": "instructor",
+          "eventType": "input_event",
+          "cpsStage": "problem_exploration",
+          "activityMode": "divergence",
+          "timestamp": "2026-06-05T11:01:32.176Z",
+          "payload": {
+            "id": "loginUsername"
+          }
+        },
         {
           "eventId": "evt-0089",
           "sessionId": "session-project-1",

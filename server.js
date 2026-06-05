@@ -6,6 +6,7 @@ const crypto = require('crypto');
 const PORT = Number(process.env.PORT || 3000);
 const ROOT = __dirname;
 const STORE_PATH = path.join(ROOT, 'data', 'store.json');
+const TEACHER_SIGNUP_CODE = 'TEACHER2026';
 
 const stages = ['problem_exploration', 'idea_generation', 'solution_design', 'action_planning'];
 
@@ -435,16 +436,19 @@ async function handleApi(req, res, url) {
       const username = String(body.username || '').trim();
       const password = String(body.password || '').trim();
       const name = String(body.name || username).trim();
+      const role = body.role === 'teacher' ? 'teacher' : 'student';
+      const teacherCode = String(body.teacherCode || '').trim();
       if (!username || !password || !name) return sendJson(res, 400, { error: '이름, 아이디, 비밀번호를 모두 입력하세요.' });
       if (allUsers().some((user) => user.username === username)) return sendJson(res, 409, { error: '이미 사용 중인 아이디입니다.' });
+      if (role === 'teacher' && teacherCode !== TEACHER_SIGNUP_CODE) return sendJson(res, 403, { error: '교수자 가입 코드가 올바르지 않습니다.' });
       store.users ||= [];
       const user = {
-        id: `stu-custom-${Date.now()}`,
+        id: `${role === 'teacher' ? 'teacher' : 'stu'}-custom-${Date.now()}`,
         username,
         password,
-        role: 'student',
+        role,
         name,
-        team: '1조'
+        team: role === 'teacher' ? '전체' : '1조'
       };
       store.users.push(user);
       saveStore();

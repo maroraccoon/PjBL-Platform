@@ -129,9 +129,14 @@
         </button>
         <h1 class="mt-8 text-3xl font-semibold">회원가입</h1>
         <div class="mt-6 space-y-3">
+          <select id="signupRole" class="w-full rounded-2xl border border-line bg-white px-4 py-3 text-sm font-bold outline-none focus:border-ink">
+            <option value="student">학습자</option>
+            <option value="teacher">교수자</option>
+          </select>
           <input id="signupName" class="w-full rounded-2xl border border-line bg-white px-4 py-3 text-sm outline-none focus:border-ink" placeholder="이름" />
           <input id="signupUsername" class="w-full rounded-2xl border border-line bg-white px-4 py-3 text-sm outline-none focus:border-ink" placeholder="아이디" />
           <input id="signupPassword" class="w-full rounded-2xl border border-line bg-white px-4 py-3 text-sm outline-none focus:border-ink" placeholder="비밀번호" type="password" />
+          <input id="signupTeacherCode" class="hidden w-full rounded-2xl border border-line bg-white px-4 py-3 text-sm outline-none focus:border-ink" placeholder="교수자 가입 코드" />
           <button id="signupBtn" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-ink px-4 py-3 text-sm font-bold text-white">
             <i data-lucide="user-plus" class="h-4 w-4"></i>가입하기
           </button>
