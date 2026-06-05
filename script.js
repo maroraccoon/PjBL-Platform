@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
   const stages = [
-    { id: 'problem_exploration', label: '문제 탐색', guide: '우리 주변에서 해결하고 싶은 문제를 찾고, 왜 중요한지 이야기합니다.', div: '문제에 대해 떠오르는 점 적기', conv: '팀이 중요하다고 본 문제 정하기' },
-    { id: 'idea_generation', label: '아이디어 생성', guide: '가능한 해결 아이디어를 많이 내고, 비슷한 아이디어끼리 묶어봅니다.', div: '새로운 해결 아이디어 적기', conv: '함께 발전시킬 아이디어 고르기' },
-    { id: 'solution_design', label: '해결안 구안', guide: '선택한 아이디어를 실제로 해볼 수 있는 해결안으로 구체화합니다.', div: '해결안의 모습 상상하기', conv: '실행 가능한 해결안 정리하기' },
-    { id: 'action_planning', label: '실행 계획 수립', guide: '누가, 언제, 무엇을 할지 정하고 필요한 준비물을 확인합니다.', div: '필요한 일과 걱정되는 점 적기', conv: '역할과 일정 확정하기' }
+    { id: 'problem_exploration', label: '문제 탐색' },
+    { id: 'idea_generation', label: '아이디어 생성' },
+    { id: 'solution_design', label: '해결안 구안' },
+    { id: 'action_planning', label: '실행 계획 수립' }
   ];
 
   const state = {
-    selectedRole: null,
+    role: null,
     token: null,
     user: null,
     projects: [],
@@ -15,26 +15,41 @@ document.addEventListener('DOMContentLoaded', () => {
     projectState: null,
     currentStage: 0,
     activePhase: 'divergence',
+    canvasExpanded: false,
+    selectedTeacherTeam: '1조',
     stream: null,
     heartbeat: null,
-    memberChart: null,
-    ratioChart: null,
-    rateChart: null
+    inputLogTimer: null,
+    charts: {}
   };
 
   const $ = (id) => document.getElementById(id);
+  const stageName = (id) => stages.find((stage) => stage.id === id)?.label || id;
+  const eventName = (type) => ({
+    idea_created: '카드 생성',
+    convergence_note_created: '수렴 카드 생성',
+    card_updated: '카드 수정',
+    card_deleted: '카드 삭제',
+    card_selected: '카드 선택',
+    note_replied: '답글',
+    note_liked: '좋아요',
+    ai_interaction_event: 'AI 요청',
+    decision_matrix_used: '평가행렬 사용',
+    artifact_revision_event: '버전 생성',
+    stage_moved: '단계 이동',
+    button_clicked: '버튼 클릭',
+    input_event: '입력',
+    phase_switch: '공간 전환'
+  }[type] || type);
 
   function showScreen(id) {
     document.querySelectorAll('.screen').forEach((screen) => screen.classList.remove('active'));
     $(id)?.classList.add('active');
-    if (window.lucide) lucide.createIcons();
+    iconRefresh();
   }
 
-  function authHeaders() {
-    return {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${state.token}`
-    };
+  function iconRefresh() {
+    if (window.lucide) lucide.createIcons();
   }
 
   async function api(path, options = {}) {
@@ -52,11 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function chooseRole(role) {
-    state.selectedRole = role;
-    $('loginRoleLabel').textContent = role === 'teacher' ? 'Instructor Login' : 'Student Login';
+    state.role = role;
+    $('loginRoleLabel').textContent = role === 'teacher' ? '교수자 로그인' : '학생 로그인';
     $('loginHelp').textContent = role === 'teacher'
-      ? '교수자 계정으로 로그인하면 프로젝트 생성과 전체 대시보드를 사용할 수 있습니다.'
-      : '학생 계정으로 로그인하면 교수자가 만든 프로젝트에 참여할 수 있습니다.';
+      ? '교수자는 팀 진행 상황과 AI 사용 편향을 관찰합니다.'
+      : '학생은 프로젝트 단계별 발산/수렴 활동을 기록합니다.';
     $('loginUsername').value = role === 'teacher' ? 'teacher' : 'minseo';
     $('loginPassword').value = role === 'teacher' ? 'teacher123' : 'student123';
     $('loginError').classList.add('hidden');
@@ -65,17 +80,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function login() {
     try {
-      const username = $('loginUsername').value.trim();
-      const password = $('loginPassword').value;
       const data = await api('/api/login', {
         method: 'POST',
-        body: JSON.stringify({ role: state.selectedRole, username, password })
+        body: JSON.stringify({
+          role: state.role,
+          username: $('loginUsername').value.trim(),
+          password: $('loginPassword').value
+        })
       });
       state.token = data.token;
       state.user = data.user;
-      localStorage.setItem('pjbl_session', JSON.stringify({ token: state.token, user: state.user, role: state.selectedRole }));
       await loadProjects();
-      showProjectScreen();
+      renderProjectScreen();
+      showScreen('projectScreen');
     } catch (error) {
       $('loginError').textContent = error.message;
       $('loginError').classList.remove('hidden');
@@ -87,53 +104,38 @@ document.addEventListener('DOMContentLoaded', () => {
     state.projects = data.projects;
   }
 
-  function showProjectScreen() {
-    const role = state.user.role;
-    $('projectRoleLabel').textContent = role === 'teacher' ? 'Instructor Space' : 'Student Space';
-    $('projectTitle').textContent = role === 'teacher' ? '관리할 프로젝트를 선택하세요' : '참여할 프로젝트를 선택하세요';
-    $('projectHelp').textContent = role === 'teacher'
-      ? '교수자는 기존 프로젝트를 확인하거나 새 프로젝트를 만들 수 있습니다.'
-      : '학생은 교수자가 만들어 둔 프로젝트 목록 중 하나를 선택합니다.';
-    $('createProjectBtn').classList.toggle('hidden', role !== 'teacher');
-    $('createProjectPanel').classList.add('hidden');
-    renderProjectList();
-    showScreen('projectScreen');
-  }
-
-  function renderProjectList() {
-    const list = $('projectList');
-    list.innerHTML = state.projects.map((project) => `
-      <button class="project-card rounded-lg panel p-5 text-left transition hover:-translate-y-1 hover:shadow-soft" data-project="${project.id}">
-        <div class="flex items-center justify-between gap-3">
-          <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-muted shadow-insetLine">${project.teams || 1} teams</span>
-          <i data-lucide="arrow-right" class="h-4 w-4 text-muted"></i>
+  function renderProjectScreen() {
+    $('projectRoleLabel').textContent = state.user.role === 'teacher' ? '교수자 공간' : '학생 공간';
+    $('projectTitle').textContent = state.user.role === 'teacher' ? '관리할 프로젝트를 선택하세요' : '참여할 프로젝트를 선택하세요';
+    $('projectHelp').textContent = 'SSE 기반 부드러운 실시간 방식으로 학생 화면과 교수자 화면이 같은 이벤트 로그를 공유합니다.';
+    $('createProjectBtn').classList.toggle('hidden', state.user.role !== 'teacher');
+    $('projectList').innerHTML = state.projects.map((project) => `
+      <button class="project-card rounded-[22px] border border-white/80 bg-white/82 p-5 text-left shadow-soft transition hover:-translate-y-1" data-project="${project.id}">
+        <div class="flex items-center justify-between">
+          <span class="rounded-full bg-yellow-200 px-3 py-1 text-xs font-bold text-ink">${project.teams || 4}개 팀</span>
+          <i data-lucide="arrow-up-right" class="h-5 w-5 text-muted"></i>
         </div>
         <h2 class="mt-5 text-xl font-semibold">${escapeHtml(project.name)}</h2>
-        <p class="mt-3 text-sm leading-6 text-muted">${escapeHtml(project.topic)}</p>
-        ${project.createdBy === 'teacher' ? '<p class="mt-4 text-xs font-semibold text-teal">교수자 생성 프로젝트</p>' : ''}
+        <p class="mt-2 text-sm leading-6 text-muted">${escapeHtml(project.topic)}</p>
       </button>
-    `).join('') || '<div class="rounded-lg border border-dashed border-line bg-white/72 p-6 text-sm text-muted">아직 프로젝트가 없습니다.</div>';
-
+    `).join('');
     document.querySelectorAll('.project-card').forEach((card) => {
       card.addEventListener('click', async () => {
         state.currentProject = state.projects.find((project) => project.id === card.dataset.project);
         await enterApp();
       });
     });
-    if (window.lucide) lucide.createIcons();
+    iconRefresh();
   }
 
   async function createProject() {
-    const name = $('newProjectName').value.trim() || `새 프로젝트 ${state.projects.length + 1}`;
-    const topic = $('newProjectTopic').value.trim() || '새로운 PjBL 탐구 주제';
     const data = await api('/api/projects', {
       method: 'POST',
-      headers: authHeaders(),
-      body: JSON.stringify({ name, topic })
+      body: JSON.stringify({
+        name: $('newProjectName').value.trim() || '새 PjBL 프로젝트',
+        topic: $('newProjectTopic').value.trim() || '연구 시연용 CPS 주제'
+      })
     });
-    $('newProjectName').value = '';
-    $('newProjectTopic').value = '';
-    $('createProjectPanel').classList.add('hidden');
     await loadProjects();
     state.currentProject = data.project;
     await enterApp();
@@ -142,22 +144,20 @@ document.addEventListener('DOMContentLoaded', () => {
   async function enterApp() {
     state.currentStage = 0;
     state.activePhase = 'divergence';
-    await loadProjectState();
+    await loadState();
     applyRoleView();
-    renderAll();
-    openProjectStream();
+    openStream();
     startHeartbeat();
-    document.title = state.user.role === 'student' ? 'PjBL 협업 시스템' : 'AI-PjBL 교수자 대시보드';
     showScreen('appScreen');
+    renderAll();
   }
 
-  async function loadProjectState() {
-    const data = await api(`/api/projects/${state.currentProject.id}/state`);
-    state.projectState = data;
-    state.currentProject = data.project;
+  async function loadState() {
+    state.projectState = await api(`/api/projects/${state.currentProject.id}/state`);
+    state.currentProject = state.projectState.project;
   }
 
-  function openProjectStream() {
+  function openStream() {
     if (state.stream) state.stream.close();
     state.stream = new EventSource(`/api/projects/${state.currentProject.id}/stream?token=${encodeURIComponent(state.token)}`);
     state.stream.addEventListener('project:update', (event) => {
@@ -169,533 +169,640 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function startHeartbeat() {
     if (state.heartbeat) clearInterval(state.heartbeat);
-    sendHeartbeat();
-    state.heartbeat = setInterval(sendHeartbeat, 10000);
-  }
-
-  async function sendHeartbeat() {
-    if (!state.token || !state.currentProject) return;
-    try {
-      await api('/api/heartbeat', {
-        method: 'POST',
-        body: JSON.stringify({ projectId: state.currentProject.id })
-      });
-    } catch (error) {
-      console.warn(error.message);
-    }
+    state.heartbeat = setInterval(() => {
+      api('/api/heartbeat', { method: 'POST', body: JSON.stringify({ projectId: state.currentProject.id }) }).catch(() => {});
+    }, 10000);
   }
 
   function applyRoleView() {
     const isStudent = state.user.role === 'student';
-    $('sidebarTitle').textContent = isStudent ? 'PjBL 협업 시스템' : 'AI-PjBL CPS Lab';
-    $('sidebarSub').textContent = isStudent ? `Student Workspace · ${state.user.name}` : `Instructor Dashboard · ${state.user.name}`;
-    $('currentProjectAside').textContent = state.currentProject?.name || '프로젝트 미선택';
-    $('appTitle').textContent = isStudent ? 'PjBL 협업 시스템' : 'AI-PjBL 교수자 대시보드';
+    $('appTitle').textContent = isStudent ? state.currentProject.name : '교수자 조율 대시보드';
     $('appSubtitle').textContent = isStudent
-      ? `${state.currentProject.name}에서 팀 활동을 단계별 협업 보드로 진행합니다.`
-      : `${state.currentProject.name}의 실시간 행동 이벤트와 팀별 협업 상태를 확인합니다.`;
+      ? '상단 CPS 흐름에 따라 발산과 수렴을 반복하며 팀 산출물을 발전시킵니다.'
+      : '팀별 실제 작업 상태, AI 사용 편향, 단계별 로그를 관찰합니다.';
     $('headerBadges').innerHTML = isStudent
-      ? ['프로젝트 활동', state.user.team, 'AI 팀원 잠금 조건: 아이디어 10개'].map((text) => badge(text)).join('')
-      : ['Live Analytics', 'Behavior Event Timeline', 'Event Rate'].map((text) => badge(text)).join('');
+      ? `<span class="rounded-full bg-white px-3 py-1 shadow-insetLine">${state.user.name}</span><span class="rounded-full bg-white px-3 py-1 shadow-insetLine">${state.user.team}</span>`
+      : '<span class="rounded-full bg-white px-3 py-1 shadow-insetLine">교수자 화면</span><span class="rounded-full bg-white px-3 py-1 shadow-insetLine">실시간 관찰</span>';
     $('teacherMetrics').classList.toggle('role-hidden', isStudent);
-    document.querySelectorAll('[data-view]').forEach((section) => {
-      section.classList.toggle('role-hidden', section.dataset.view !== state.user.role);
-    });
-    $('sideNav').innerHTML = isStudent ? `
-      <a href="#workspace" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-ink hover:bg-white"><i data-lucide="layout-dashboard" class="h-4 w-4"></i>프로젝트 활동</a>
-    ` : `
-      <a href="#awareness" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-ink hover:bg-white"><i data-lucide="activity" class="h-4 w-4"></i>그룹 인식</a>
-      <a href="#orchestration" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-muted hover:bg-white hover:text-ink"><i data-lucide="sliders-horizontal" class="h-4 w-4"></i>교수자 조율</a>
-      <a href="#studentRoster" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-muted hover:bg-white hover:text-ink"><i data-lucide="users-round" class="h-4 w-4"></i>학생 명단</a>
-      <a href="#eventlog" class="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-muted hover:bg-white hover:text-ink"><i data-lucide="list-tree" class="h-4 w-4"></i>행동 이벤트</a>
-    `;
-  }
-
-  function renderStages() {
-    const icons = ['compass', 'lightbulb', 'hammer', 'check-circle'];
-    $('stageTabs').innerHTML = stages.map((stage, index) => `
-      <button class="stage-tab flex w-full items-center gap-3 rounded-lg p-3 text-left text-sm font-semibold transition ${index === state.currentStage ? 'stage-active' : 'bg-white/72 text-muted shadow-insetLine hover:bg-white'}" data-stage="${index}">
-        <span class="grid h-8 w-8 place-items-center rounded-lg ${index === state.currentStage ? 'bg-white/16 text-white' : 'bg-paper text-ocean'}">
-          <i data-lucide="${icons[index]}" class="h-4 w-4"></i>
-        </span>
-        <span><span class="block text-xs opacity-70">Step ${index + 1}</span>${stage.label}</span>
-      </button>
-    `).join('');
-    document.querySelectorAll('.stage-tab').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        const next = Number(btn.dataset.stage);
-        if (next === state.currentStage) return;
-        const previous = stages[state.currentStage].id;
-        state.currentStage = next;
-        await addEvent('cps_stage_transition', { fromStage: previous, toStage: stages[next].id }, 'convergence');
-      });
-    });
-
-    const stage = stages[state.currentStage];
-    $('stageKicker').textContent = `Step ${String(state.currentStage + 1).padStart(2, '0')}`;
-    $('studentStageTitle').textContent = stage.label;
-    $('studentStageGuide').textContent = stage.guide;
-    $('convTitle').textContent = stage.conv;
-    $('prevStageBtn').disabled = state.currentStage === 0;
-    $('nextStageBtn').disabled = state.currentStage === stages.length - 1;
-    $('prevStageBtn').classList.toggle('opacity-45', state.currentStage === 0);
-    $('nextStageBtn').classList.toggle('opacity-45', state.currentStage === stages.length - 1);
-    renderPhase();
-  }
-
-  function renderPhase() {
-    $('phaseDivergeBtn').className = `phase-btn rounded-md px-3 py-2 text-xs font-semibold ${state.activePhase === 'divergence' ? 'bg-amber text-white shadow-sm' : 'text-muted hover:bg-white'}`;
-    $('phaseConvergeBtn').className = `phase-btn rounded-md px-3 py-2 text-xs font-semibold ${state.activePhase === 'convergence' ? 'bg-teal text-white shadow-sm' : 'text-muted hover:bg-white'}`;
-    $('divergencePanel').classList.toggle('hidden', state.activePhase !== 'divergence');
-    $('convergencePanel').classList.toggle('hidden', state.activePhase !== 'convergence');
-  }
-
-  function renderStudentBoard() {
-    const stageId = stages[state.currentStage].id;
-    const notes = state.projectState.notes || [];
-    const stageNotes = notes.filter((note) => note.stage === stageId && note.mode === 'divergence');
-    const convNotes = notes.filter((note) => note.stage === stageId && note.mode === 'convergence');
-    const colors = ['bg-amber-50 border-amber-200', 'bg-blue-50 border-blue-200', 'bg-emerald-50 border-emerald-200'];
-
-    $('divergenceCards').innerHTML = stageNotes.map((note, index) => renderNoteCard(note, `${colors[index % colors.length]} ${index % 2 ? '-rotate-1' : 'rotate-1'}`)).join('')
-      || '<div class="rounded-lg border border-dashed border-line bg-white/72 p-6 text-sm text-muted">아직 추가된 생각 카드가 없습니다.</div>';
-
-    $('convergenceCards').innerHTML = convNotes.map((note) => renderNoteCard(note, 'border-emerald-100 bg-white/92')).join('')
-      || '<div class="rounded-lg border border-dashed border-line bg-white/72 p-6 text-sm text-muted">아직 정리된 내용이 없습니다.</div>';
-  }
-
-  function renderNoteCard(note, styleClass) {
-    const canModify = state.user.role === 'teacher' || note.actorId === state.user.id;
-    const replies = Array.isArray(note.replies) ? note.replies : [];
-    return `
-      <article class="note-card ${styleClass} rounded-xl border p-4 shadow-sm" data-note-id="${note.id}">
-        <p class="min-h-16 whitespace-pre-wrap text-sm font-semibold leading-6 text-slate-700">${escapeHtml(note.text)}</p>
-        <div class="mt-4 flex items-center justify-between border-t border-white/70 pt-3 text-xs text-muted">
-          <span class="inline-flex items-center gap-2"><span class="grid h-6 w-6 place-items-center rounded-full bg-white text-[10px] font-bold text-ink shadow-insetLine">${note.author.slice(0, 1)}</span>${escapeHtml(note.author)}</span>
-          <span>${formatTime(note.timestamp)}${note.editedAt ? ' · 수정됨' : ''}</span>
-        </div>
-        <div class="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
-          <button class="rounded-full bg-white px-3 py-1 text-ocean shadow-insetLine hover:bg-paper" data-note-action="reply" data-note-id="${note.id}">답글</button>
-          ${canModify ? `<button class="rounded-full bg-white px-3 py-1 text-muted shadow-insetLine hover:bg-paper" data-note-action="edit" data-note-id="${note.id}">수정</button>
-          <button class="rounded-full bg-white px-3 py-1 text-rose shadow-insetLine hover:bg-rose/10" data-note-action="delete" data-note-id="${note.id}">삭제</button>` : ''}
-        </div>
-        ${replies.length ? `
-          <div class="mt-3 space-y-2 border-t border-white/70 pt-3">
-            ${replies.map((reply) => `
-              <div class="rounded-lg bg-white/72 p-3 text-xs leading-5 text-slate-700 shadow-insetLine">
-                <div class="mb-1 flex items-center justify-between gap-2 font-semibold">
-                  <span>${escapeHtml(reply.author)}</span>
-                  <span class="text-muted">${formatTime(reply.timestamp)}</span>
-                </div>
-                <p class="whitespace-pre-wrap">${escapeHtml(reply.text)}</p>
-              </div>
-            `).join('')}
-          </div>
-        ` : ''}
-      </article>
-    `;
-  }
-
-  function renderStudentAwareness() {
-    const roster = state.projectState.roster || [];
-    const currentTeam = state.user.team;
-    const teamMembers = roster.filter((student) => student.team === currentTeam);
-    $('studentAwarenessList').innerHTML = teamMembers.map((student) => `
-      <div>
-        <div class="mb-1 flex justify-between text-xs">
-          <span class="font-semibold text-ink">${escapeHtml(student.name)}</span>
-          <span class="text-muted">${student.eventCount} events · ${student.rate.toFixed(2)}/분</span>
-        </div>
-        <div class="flex h-2 overflow-hidden rounded-full bg-slate-100">
-          <div class="bg-amber" style="width:${Math.min(100, student.divergence * 12)}%"></div>
-          <div class="bg-teal" style="width:${Math.min(100, student.convergence * 12)}%"></div>
-        </div>
-      </div>
-    `).join('') || '<p class="text-sm text-muted">아직 팀 활동 데이터가 없습니다.</p>';
-
-    const events = state.projectState.events || [];
-    const divergence = events.filter((event) => event.activityMode === 'divergence').length;
-    const convergence = events.filter((event) => event.activityMode === 'convergence').length;
-    const total = divergence + convergence || 1;
-    const divPct = Math.round((divergence / total) * 100);
-    $('studentBalanceRatio').textContent = `${divPct}% / ${100 - divPct}%`;
-    $('studentBalanceBar').innerHTML = `<div class="bg-amber" style="width:${divPct}%"></div><div class="bg-teal" style="width:${100 - divPct}%"></div>`;
-  }
-
-  function renderArtifactTimeline() {
-    const revisions = state.projectState.revisions || [];
-    $('artifactTimeline').innerHTML = revisions.slice(0, 4).map((revision) => `
-      <article class="relative z-10 rounded-lg bg-white p-3 text-center shadow-insetLine">
-        <div class="mx-auto grid h-8 w-8 place-items-center rounded-full ${revision.type === 'ai' ? 'bg-violet text-white' : 'bg-ocean text-white'}">
-          <i data-lucide="${revision.type === 'ai' ? 'sparkles' : 'git-commit-horizontal'}" class="h-4 w-4"></i>
-        </div>
-        <p class="mt-2 text-xs font-semibold">${escapeHtml(revision.version)}</p>
-        <p class="mt-1 truncate text-[11px] text-muted">${escapeHtml(revision.title)}</p>
-        <p class="mt-1 text-[10px] text-muted">${formatTime(revision.timestamp)}</p>
-      </article>
-    `).join('') || '<div class="col-span-4 rounded-lg border border-dashed border-line bg-white/72 p-4 text-center text-sm text-muted">아직 산출물 수정 기록이 없습니다.</div>';
-  }
-
-  function renderAIFeed() {
-    const feed = state.projectState.aiFeed || [];
-    $('aiFeed').innerHTML = feed.map((item) => `
-      <article class="rounded-lg ${item.by === 'AI' ? 'border border-purple-100 bg-white' : 'border border-blue-100 bg-blue-50'} p-3 text-sm leading-6 shadow-sm">
-        <div class="mb-1 flex items-center justify-between text-xs">
-          <strong class="${item.by === 'AI' ? 'text-violet' : 'text-ocean'}">${escapeHtml(item.by)}</strong>
-          <span class="text-muted">${formatTime(item.timestamp)}</span>
-        </div>
-        <p class="text-slate-700">${escapeHtml(item.text)}</p>
-      </article>
-    `).join('');
-  }
-
-  function renderEvents() {
-    const colors = {
-      cps_stage_transition: 'bg-ocean/10 text-ocean',
-      phase_switch: 'bg-teal/10 text-teal',
-      idea_created: 'bg-amber/10 text-amber',
-      convergence_note_created: 'bg-teal/10 text-teal',
-      note_updated: 'bg-blue-100 text-blue-700',
-      note_deleted: 'bg-rose/10 text-rose',
-      note_replied: 'bg-violet/10 text-violet',
-      ai_interaction_event: 'bg-violet/10 text-violet',
-      collaboration_event: 'bg-indigo-100 text-indigo-700',
-      artifact_revision_event: 'bg-rose/10 text-rose'
-    };
-    const events = state.projectState.events || [];
-    $('eventTimeline').innerHTML = events.slice(0, 48).map((event, index) => `
-      <div class="${index === 0 ? 'event-enter' : ''} rounded-lg bg-paper p-4">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <span class="rounded-full px-3 py-1 text-xs font-semibold ${colors[event.eventType] || 'bg-slate-100 text-muted'}">${event.eventType}</span>
-          <span class="text-xs text-muted">${formatTime(event.timestamp, true)}</span>
-        </div>
-        <div class="mt-3 grid gap-2 text-xs text-muted md:grid-cols-4">
-          <span><strong class="text-ink">stage</strong> ${event.cpsStage}</span>
-          <span><strong class="text-ink">mode</strong> ${event.activityMode}</span>
-          <span><strong class="text-ink">actor</strong> ${event.actorName || event.actorId}</span>
-          <span><strong class="text-ink">team</strong> ${event.teamId}</span>
-        </div>
-      </div>
-    `).join('') || '<div class="rounded-lg border border-dashed border-line bg-white/72 p-6 text-sm text-muted">아직 이벤트가 없습니다.</div>';
-  }
-
-  function renderMetrics() {
-    const events = state.projectState.events || [];
-    const divergence = events.filter((event) => event.activityMode === 'divergence').length;
-    const convergence = events.filter((event) => event.activityMode === 'convergence').length;
-    const total = divergence + convergence || 1;
-    const divPercent = Math.round((divergence / total) * 100);
-    const teamIdeaCount = state.projectState.aiUnlock?.teamIdeaCount || 0;
-    const unlocked = state.projectState.aiUnlock?.unlocked || false;
-
-    $('metricEvents').textContent = events.length;
-    $('metricUnlock').textContent = unlocked ? 'Open' : `Locked ${teamIdeaCount}/10`;
-    $('metricUnlock').className = `mt-1 text-xl font-semibold ${unlocked ? 'text-teal' : 'text-amber'}`;
-    $('metricRatio').textContent = `${divPercent}/${100 - divPercent}`;
-
-    $('aiLockBadge').innerHTML = unlocked
-      ? '<span class="inline-flex items-center gap-1"><i data-lucide="unlock" class="h-3.5 w-3.5"></i>사용 가능</span>'
-      : '<span class="inline-flex items-center gap-1"><i data-lucide="lock" class="h-3.5 w-3.5"></i>Locked</span>';
-    $('aiLockBadge').className = `rounded-full px-3 py-1 text-xs font-semibold ${unlocked ? 'bg-teal/10 text-teal' : 'bg-amber/10 text-amber'}`;
-    $('aiGate').textContent = unlocked
-      ? 'AI 팀원이 잠금 해제되었습니다. 질문 방향, 놓친 점, 선택 기준을 함께 점검할 수 있습니다.'
-      : `아이디어를 10개 이상 적으면 AI 팀원이 잠금 해제 됩니다! 현재 ${teamIdeaCount}/10개입니다.`;
-
-    document.querySelectorAll('.ai-btn').forEach((btn) => {
-      btn.disabled = !unlocked;
-      btn.classList.toggle('disabled-control', !unlocked);
-    });
-    $('studentHelpBtn').disabled = !unlocked;
-    $('studentHelpBtn').classList.toggle('disabled-control', !unlocked);
-  }
-
-  function renderCharts() {
-    if (state.user.role !== 'teacher' || !window.Chart) return;
-    const roster = state.projectState.roster || [];
-    const events = state.projectState.events || [];
-    const labels = roster.map((student) => student.name);
-
-    const destroy = (chart) => chart && chart.destroy();
-    destroy(state.memberChart);
-    destroy(state.ratioChart);
-    destroy(state.rateChart);
-
-    state.memberChart = new Chart($('memberChart'), {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [
-          { label: 'Divergence', data: roster.map((s) => s.divergence), backgroundColor: '#2563eb' },
-          { label: 'Convergence', data: roster.map((s) => s.convergence), backgroundColor: '#0f9f8f' }
-        ]
-      },
-      options: { responsive: true, plugins: { legend: { position: 'bottom' }, title: { display: true, text: '학생별 활동량' } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
-    });
-
-    const eventCounts = ['idea_created', 'convergence_note_created', 'ai_interaction_event', 'artifact_revision_event'].map((type) => events.filter((event) => event.eventType === type).length);
-    state.ratioChart = new Chart($('ratioChart'), {
-      type: 'doughnut',
-      data: {
-        labels: ['Idea', 'Convergence', 'AI', 'Revision'],
-        datasets: [{ data: eventCounts, backgroundColor: ['#2563eb', '#0f9f8f', '#d97706', '#e11d48'], borderWidth: 0 }]
-      },
-      options: { cutout: '68%', plugins: { legend: { position: 'bottom' }, title: { display: true, text: '이벤트 유형 비율' } } }
-    });
-
-    state.rateChart = new Chart($('rateChart'), {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [{ label: 'events / min', data: roster.map((s) => Number(s.rate.toFixed(2))), backgroundColor: '#7c3aed' }]
-      },
-      options: { responsive: true, plugins: { legend: { position: 'bottom' }, title: { display: true, text: '접속시간 대비 이벤트 생성률' } }, scales: { y: { beginAtZero: true } } }
-    });
-  }
-
-  function renderCollaboration() {
-    const roster = state.projectState.roster || [];
-    const active = roster.filter((student) => student.online).length;
-    const top = [...roster].sort((a, b) => b.rate - a.rate)[0];
-    const teamIdeaCount = state.projectState.aiUnlock?.teamIdeaCount || 0;
-    const states = [
-      ['접속 상태', `${active}명이 현재 프로젝트에 접속 중입니다.`, 'bg-teal'],
-      ['AI 팀원 조건', `현재 팀 아이디어 이벤트는 ${teamIdeaCount}/10개입니다.`, teamIdeaCount >= 10 ? 'bg-teal' : 'bg-amber'],
-      ['이벤트 생성률', top ? `${top.name}의 분당 이벤트 생성률이 ${top.rate.toFixed(2)}입니다.` : '아직 학생 활동이 없습니다.', 'bg-ocean']
-    ];
-    $('collabTimeline').innerHTML = states.map(([title, text, color]) => `
-      <div class="rounded-lg bg-paper p-4">
-        <div class="flex items-center gap-3">
-          <span class="h-2.5 w-2.5 rounded-full ${color}"></span>
-          <h3 class="font-semibold">${title}</h3>
-        </div>
-        <p class="mt-2 text-sm leading-6 text-muted">${text}</p>
-      </div>
-    `).join('');
-  }
-
-  function renderTeams() {
-    const teams = state.projectState.teams || [];
-    $('teamCards').innerHTML = teams.map((team) => {
-      const unlocked = team.ideaCount >= 10;
-      return `
-        <article class="rounded-lg bg-paper p-4">
-          <div class="flex items-center justify-between gap-2">
-            <h3 class="text-lg font-semibold">${team.name}</h3>
-            <span class="rounded-full px-3 py-1 text-xs font-semibold ${unlocked ? 'bg-teal/10 text-teal' : 'bg-amber/10 text-amber'}">${unlocked ? 'AI Open' : 'AI Locked'}</span>
-          </div>
-          <p class="mt-3 text-sm text-muted">아이디어 이벤트</p>
-          <p class="font-semibold">${team.ideaCount}/10</p>
-          <div class="mt-4">
-            <div class="flex justify-between text-sm"><span>팀 이벤트</span><strong>${team.eventCount}</strong></div>
-            <div class="mt-2 h-2 rounded-full bg-slate-200"><div class="h-2 rounded-full ${unlocked ? 'bg-teal' : 'bg-amber'}" style="width:${Math.min(100, team.ideaCount * 10)}%"></div></div>
-          </div>
-          <div class="mt-4 rounded-lg bg-white p-3 text-sm leading-6 text-muted shadow-insetLine">
-            <strong class="text-ink">Intervention</strong><br>${unlocked ? 'AI 팀원을 활용해 수렴 기준을 비교하도록 안내' : 'AI 사용 전 학생 아이디어를 먼저 10개 이상 생성하도록 안내'}
-          </div>
-        </article>
-      `;
-    }).join('') || '<div class="rounded-lg border border-dashed border-line bg-white/72 p-6 text-sm text-muted">팀 데이터가 없습니다.</div>';
-  }
-
-  function renderStudentRoster() {
-    const roster = state.projectState.roster || [];
-    $('studentRosterCount').textContent = `${roster.length}명`;
-    $('studentRosterList').innerHTML = roster.map((student) => {
-      const statusClass = student.online ? 'bg-teal/10 text-teal' : student.eventCount ? 'bg-amber/10 text-amber' : 'bg-slate-100 text-muted';
-      return `
-        <article class="rounded-lg bg-paper p-4">
-          <div class="flex items-start justify-between gap-3">
-            <div class="flex items-center gap-3">
-              <span class="grid h-10 w-10 place-items-center rounded-full bg-white text-sm font-semibold text-ink shadow-insetLine">${student.name.slice(0, 1)}</span>
-              <div>
-                <h3 class="font-semibold">${escapeHtml(student.name)}</h3>
-                <p class="text-xs text-muted">${student.team} · ${student.username}</p>
-              </div>
-            </div>
-            <span class="rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusClass}">${student.online ? '접속 중' : '오프라인'}</span>
-          </div>
-          <div class="mt-3 grid grid-cols-3 gap-2 text-xs text-muted">
-            <span>접속 ${student.minutes.toFixed(1)}분</span>
-            <span>이벤트 ${student.eventCount}</span>
-            <span>${student.rate.toFixed(2)}/분</span>
-          </div>
-        </article>
-      `;
-    }).join('');
+    document.querySelectorAll('[data-view]').forEach((section) => section.classList.toggle('role-hidden', section.dataset.view !== state.user.role));
   }
 
   function renderAll() {
     if (!state.projectState) return;
-    renderStages();
+    renderWorkspaceShell();
+    renderStepBar();
     renderStudentBoard();
-    renderStudentAwareness();
+    renderAiPanel();
+    renderTeamAwareness();
     renderArtifactTimeline();
-    renderAIFeed();
+    renderTeacherDashboard();
     renderEvents();
-    renderMetrics();
-    renderCollaboration();
-    renderTeams();
-    renderStudentRoster();
-    renderCharts();
-    if (window.lucide) lucide.createIcons();
+    iconRefresh();
   }
 
-  async function addEvent(eventType, payload = {}, mode = null) {
-    const data = await api(`/api/projects/${state.currentProject.id}/events`, {
-      method: 'POST',
-      body: JSON.stringify({
-        eventType,
-        cpsStage: stages[state.currentStage].id,
-        activityMode: mode || state.activePhase,
-        payload
-      })
+  function renderWorkspaceShell() {
+    const grid = $('workspaceGrid');
+    if (!grid) return;
+    grid.style.gridTemplateColumns = state.canvasExpanded ? 'minmax(0, 1fr)' : '260px minmax(0, 1fr) 360px';
+    grid.style.minHeight = state.canvasExpanded ? '100vh' : '780px';
+    grid.style.width = state.canvasExpanded ? '100vw' : '';
+    $('leftStagePanel').classList.toggle('hidden', state.canvasExpanded);
+    $('rightSupportPanel').classList.toggle('hidden', state.canvasExpanded);
+    $('workspaceTopBar').classList.toggle('hidden', state.canvasExpanded);
+    $('artifactFooter').classList.toggle('hidden', state.canvasExpanded);
+    $('workspace').classList.toggle('fixed', state.canvasExpanded);
+    $('workspace').classList.toggle('inset-0', state.canvasExpanded);
+    $('workspace').classList.toggle('z-50', state.canvasExpanded);
+    $('workspace').classList.toggle('rounded-none', state.canvasExpanded);
+    $('workspace').classList.toggle('h-screen', state.canvasExpanded);
+    $('workspace').classList.toggle('w-screen', state.canvasExpanded);
+    $('workspace').classList.toggle('overflow-hidden', state.canvasExpanded);
+    $('canvasArea').classList.toggle('p-8', state.canvasExpanded);
+    $('canvasArea').style.height = state.canvasExpanded ? '100vh' : '';
+    $('canvasArea').style.width = state.canvasExpanded ? '100vw' : '';
+    $('expandCanvasLabel').textContent = state.canvasExpanded ? '축소' : '확장';
+  }
+
+  function renderStepBar() {
+    $('stageTabs').innerHTML = stages.map((stage, index) => `
+      <button class="stage-tab flex min-w-[160px] flex-1 items-center gap-3 rounded-2xl px-4 py-3 text-left transition ${index === state.currentStage ? 'bg-ink text-white shadow-soft' : 'bg-white/78 text-muted shadow-insetLine hover:bg-white'}" data-stage="${index}">
+        <span class="grid h-8 w-8 place-items-center rounded-full ${index === state.currentStage ? 'bg-yellow-200 text-ink' : 'bg-paper text-ink'}">${index + 1}</span>
+        <span><span class="block text-[11px] font-bold uppercase opacity-70">${index + 1}단계</span><strong>${stage.label}</strong></span>
+      </button>
+    `).join('');
+    document.querySelectorAll('.stage-tab').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const next = Number(button.dataset.stage);
+        if (next === state.currentStage) return;
+        await logEvent('stage_moved', { from: stages[state.currentStage].id, to: stages[next].id }, 'convergence', stages[next].id);
+        state.currentStage = next;
+        state.activePhase = 'divergence';
+        renderAll();
+      });
     });
-    state.projectState = data.state;
-    renderAll();
+    $('studentStageTitle').textContent = stages[state.currentStage].label;
+    $('stageKicker').textContent = `${String(state.currentStage + 1).padStart(2, '0')}단계`;
+    $('phaseDivergeBtn').className = phaseClass('divergence', 'bg-yellow-300 text-ink');
+    $('phaseConvergeBtn').className = phaseClass('convergence', 'bg-teal text-white');
   }
 
-  async function addNote(mode) {
+  function phaseClass(phase, activeClass) {
+    return `phase-btn rounded-xl px-4 py-2 text-sm font-bold ${state.activePhase === phase ? activeClass : 'text-muted hover:bg-white'}`;
+  }
+
+  function renderStudentBoard() {
+    const stage = stages[state.currentStage].id;
+    const notes = state.projectState.notes || [];
+    const stageNotes = notes.filter((note) => note.stage === stage);
+    const divNotes = stageNotes.filter((note) => note.mode === 'divergence');
+    const convNotes = stageNotes.filter((note) => note.mode === 'convergence');
+    $('studentStageGuide').innerHTML = guideFor(stage, state.activePhase);
+    $('promptCards').innerHTML = state.activePhase === 'divergence'
+      ? (['solution_design', 'action_planning'].includes(stage) ? checkCarousel(stage, 'divergence') : promptCards(stage, 'divergence'))
+      : '';
+    $('divergencePanel').classList.toggle('hidden', state.activePhase !== 'divergence');
+    $('convergencePanel').classList.toggle('hidden', state.activePhase !== 'convergence');
+    $('convergenceInputRow')?.classList.toggle('hidden', stage === 'problem_exploration' && state.activePhase === 'convergence');
+    $('divergenceCards').innerHTML = divNotes.map(renderNoteCard).join('') || emptyCard('아직 발산 카드가 없습니다.');
+    $('convergenceCards').innerHTML = convergenceContent(stage, convNotes, divNotes);
+  }
+
+  function guideFor(stage, phase) {
+    const guides = {
+      problem_exploration: {
+        divergence: '브레인스토밍으로 관찰, 불편, 질문을 넓게 모읍니다.',
+        convergence: '<strong>문제 정의 구조</strong><br>[사용자]는 _______ 이다.<br>왜냐하면 _______ 때문이다.'
+      },
+      idea_generation: {
+        divergence: '가능한 해결 아이디어를 많이 작성합니다.',
+        convergence: '평가행렬법으로 실현 가능성, 영향력, 차별성을 1~5점으로 비교합니다.'
+      },
+      solution_design: {
+        divergence: '선택된 아이디어를 구현할 여러 형태를 탐색합니다.',
+        convergence: '실제 제작 가능한 형태와 핵심 기능을 정리합니다.'
+      },
+      action_planning: {
+        divergence: '프로토타입 테스트에서 발생할 수 있는 상황을 상상합니다.',
+        convergence: '이번 테스트에서 반드시 확인할 한 가지와 성공 기준을 정합니다.'
+      }
+    };
+    return guides[stage][phase];
+  }
+
+  function convergenceContent(stage, convNotes, divNotes) {
+    if (stage === 'problem_exploration') return problemDefinitionPanel(convNotes);
+    if (stage === 'idea_generation') return decisionMatrixPanel(divNotes);
+    return [
+      teacherFeedbackPanel(stage),
+      convNotes.map(renderNoteCard).join('') || emptyCard('아직 수렴 결과가 없습니다.')
+    ].join('');
+  }
+
+  function checkCarousel(stage, phase = 'convergence') {
+    if (!['solution_design', 'action_planning'].includes(stage)) return '';
+    const questions = {
+      solution_design: [
+        ...(phase === 'divergence'
+          ? [
+            '선택된 아이디어를 구현하는 방법이 여러 가지라면 어떤 형태들이 가능할까요?',
+            '영상, 포스터, 앱, 모형, 서비스 절차 중 무엇이 가능할까요?',
+            '프로토타입을 만든다면 어떤 재료나 도구를 활용할 수 있을까요?',
+            '사용자가 직접 경험해야 할 가장 중요한 순간은 어떤 장면인가요?'
+          ]
+          : [
+            '이 해결안은 현재 가진 시간과 도구로 실제 제작 가능한가요?',
+            '사용자가 실제로 경험해야 하는 가장 중요한 장면은 무엇인가요?',
+            '반드시 확인해야 할 핵심 기능은 무엇인가요?',
+            '가장 큰 위험 요소는 무엇이며 어떻게 줄일 수 있나요?'
+          ])
+      ],
+      action_planning: [
+        ...(phase === 'divergence'
+          ? [
+            '우리 프로토타입을 사용할 사람이 겪을 수 있는 상황은 무엇인가요?',
+            '테스트를 통해 확인하고 싶은 것은 무엇인가요?',
+            '사용자가 예상과 다르게 반응한다면 어떤 장면일까요?'
+          ]
+          : [
+            '이번 테스트에서 반드시 확인해야 할 한 가지는 무엇인가요?',
+            '그것을 확인하기 위한 구체적인 질문은 무엇인가요?',
+            '성공했다고 판단할 수 있는 기준은 관찰 가능한가요?',
+            '사용자가 예상과 다르게 반응하면 무엇을 기록해야 하나요?'
+          ])
+      ]
+    };
+    return `
+      <section class="mb-4 rounded-[22px] border border-indigo-300 bg-indigo-50 p-4 shadow-soft">
+        <div class="mb-3 flex items-center justify-between">
+          <h3 class="text-base font-semibold">점검해보기</h3>
+          <div class="flex gap-2">
+            <button class="check-prev rounded-full bg-white px-3 py-1 text-sm font-bold shadow-insetLine" type="button">&lt;</button>
+            <button class="check-next rounded-full bg-white px-3 py-1 text-sm font-bold shadow-insetLine" type="button">&gt;</button>
+          </div>
+        </div>
+        <div class="check-carousel" data-check-stage="${stage}" data-check-index="0">
+          ${questions[stage].map((question, index) => `<article class="check-item ${index ? 'hidden' : ''} rounded-2xl bg-white p-4 text-sm font-semibold leading-6 text-slate-800 shadow-insetLine" data-check-item="${index}">${question}</article>`).join('')}
+        </div>
+      </section>
+    `;
+  }
+
+  function teacherFeedbackPanel(stage) {
+    if (!['solution_design', 'action_planning'].includes(stage)) return '';
+    const feedback = (state.projectState.events || [])
+      .filter((event) => event.eventType === 'teacher_feedback' && event.cpsStage === stage && (!event.payload.teamName || event.payload.teamName === state.user.team))
+      .slice(0, 3);
+    return `
+      <section class="mb-4 rounded-[22px] border border-rose-300 bg-white p-4 shadow-soft">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-[.16em] text-rose">교수자 피드백</p>
+            <h3 class="mt-1 text-base font-semibold">교수자 피드백이 입력되면 여기에 표시됩니다.</h3>
+          </div>
+          <i data-lucide="message-square-quote" class="h-5 w-5 text-rose"></i>
+        </div>
+        <div class="mt-3 space-y-2">
+          ${feedback.length ? feedback.map((item) => `<article class="rounded-2xl border border-rose-100 bg-white p-4 text-sm leading-6 shadow-soft"><strong class="text-ink">${escapeHtml(item.actorName || '교수자')}</strong><p class="mt-1 text-slate-700">${escapeHtml(item.payload.feedback || '')}</p></article>`).join('') : '<article class="rounded-2xl border border-rose-100 bg-white p-4 text-sm text-slate-700 shadow-soft">아직 입력된 교수자 피드백이 없습니다. 피드백이 도착하면 팀은 이 영역에서 확인할 수 있습니다.</article>'}
+        </div>
+      </section>
+    `;
+  }
+
+  function promptCards(stage, phase) {
+    const prompts = {
+      solution_design: {
+        divergence: ['선택된 아이디어를 구현하는 방법이 여러 가지라면 어떤 형태들이 가능할까요?', '영상, 포스터, 앱, 모형, 서비스 절차 중 무엇이 가능할까요?', '프로토타입을 만든다면 어떤 재료나 도구를 활용할 수 있을까요?', '사용자가 직접 경험해야 할 가장 중요한 순간은 어떤 장면인가요?'],
+        convergence: ['실제 제작 가능한 형태는 무엇인가요?', '선택한 이유는 무엇인가요?', '반드시 확인해야 할 핵심 기능은 무엇인가요?', '누가 언제까지 무엇을 준비해야 하나요?']
+      },
+      action_planning: {
+        divergence: ['우리 프로토타입을 사용할 사람이 겪을 수 있는 상황은?', '테스트를 통해 확인하고 싶은 것은?', '사용자가 예상과 다르게 반응한다면 어떤 장면일까?'],
+        convergence: ['이번 테스트에서 반드시 확인해야 할 한 가지는?', '그것을 확인하기 위한 구체적인 질문은?', '성공했다고 판단할 수 있는 기준은?']
+      }
+    };
+    return `<div class="mb-4 grid gap-3 md:grid-cols-2">${(prompts[stage]?.[phase] || []).map((text) => `<button class="rounded-2xl bg-white/88 p-4 text-left text-sm font-semibold leading-6 shadow-insetLine" data-fill-prompt="${escapeHtml(text)}">${escapeHtml(text)}</button>`).join('')}</div>`;
+  }
+
+  function problemDefinitionPanel(convNotes) {
+    return `
+      <div class="rounded-[22px] bg-white p-5 shadow-soft">
+        <p class="text-xs font-bold uppercase tracking-[.16em] text-muted">문제 정의</p>
+        <div class="mt-4 grid gap-3 md:grid-cols-2">
+          <input id="problemUserInput" class="rounded-xl border border-line px-3 py-3 text-sm" placeholder="[사용자] 예: 대학생" />
+          <input id="problemPainInput" class="rounded-xl border border-line px-3 py-3 text-sm" placeholder="어려움 예: 과제 관리에 어려움을 겪는다" />
+          <input id="problemReasonInput" class="rounded-xl border border-line px-3 py-3 text-sm md:col-span-2" placeholder="왜냐하면 예: 여러 플랫폼에 일정이 흩어져 있기 때문이다" />
+          <textarea id="problemHmwInput" class="min-h-20 resize-none rounded-xl border border-line px-3 py-3 text-sm md:col-span-2" placeholder="HMW 문장으로 정리하기 예: 어떻게 하면 대학생이 여러 플랫폼을 오가지 않고 오늘 해야 할 과제를 바로 파악할 수 있을까?"></textarea>
+        </div>
+        <button id="saveProblemDefinition" class="mt-3 rounded-xl bg-teal px-4 py-2 text-sm font-bold text-white">문제 정의 저장</button>
+      </div>
+      <div class="mt-4 grid gap-4">${convNotes.map(renderNoteCard).join('')}</div>
+    `;
+  }
+
+  function decisionMatrixPanel(divNotes) {
+    const rows = divNotes;
+    if (!rows.length) return emptyCard('먼저 발산 공간에서 아이디어 카드를 작성하세요.');
+    return `
+      <div class="rounded-[22px] bg-white/90 p-5 shadow-insetLine">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-[.16em] text-muted">평가행렬 워크시트</p>
+            <h3 class="mt-1 text-lg font-semibold">아이디어 비교 평가</h3>
+          </div>
+          <button id="saveDecisionMatrix" class="rounded-xl bg-ink px-4 py-2 text-sm font-bold text-white">평가 저장</button>
+        </div>
+        <div class="mt-4 overflow-auto rounded-xl border border-slate-300">
+          <table class="decision-worksheet w-full min-w-[760px] border-collapse text-sm">
+            <thead>
+              <tr class="bg-sky-100">
+                <th colspan="7" class="border border-white px-3 py-2 text-left">주제 : ${escapeHtml(state.currentProject.topic || state.currentProject.name)}</th>
+              </tr>
+              <tr class="bg-sky-100 text-center">
+                <th rowspan="2" class="w-12 border border-white px-2 py-3"></th>
+                <th rowspan="2" class="w-[280px] border border-white px-3 py-3">아이디어</th>
+                <th colspan="4" class="border border-white px-3 py-2">평가 준거</th>
+                <th rowspan="2" class="w-20 border border-white px-3 py-3">총계</th>
+              </tr>
+              <tr class="bg-sky-100 text-center">
+                <th class="border border-white px-3 py-2"><input class="criteria-input w-full rounded bg-white/80 px-2 py-1 text-center" value="A" title="평가 준거 A" /></th>
+                <th class="border border-white px-3 py-2"><input class="criteria-input w-full rounded bg-white/80 px-2 py-1 text-center" value="B" title="평가 준거 B" /></th>
+                <th class="border border-white px-3 py-2"><input class="criteria-input w-full rounded bg-white/80 px-2 py-1 text-center" value="C" title="평가 준거 C" /></th>
+                <th class="border border-white px-3 py-2"><input class="criteria-input w-full rounded bg-white/80 px-2 py-1 text-center" value="D" title="평가 준거 D" /></th>
+              </tr>
+            </thead>
+            <tbody>${rows.map((note, rowIndex) => matrixRow(note, rowIndex)).join('')}</tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  }
+
+  function matrixRow(note, rowIndex) {
+    return `<tr class="bg-slate-50 text-center" data-matrix-note="${note.id}">
+      <td class="border border-white bg-sky-50 px-2 py-3 font-semibold">${rowIndex + 1}</td>
+      <td class="border border-white bg-sky-50 px-3 py-3 text-left font-semibold">${escapeHtml(note.text)}</td>
+      ${['A', 'B', 'C', 'D'].map((key) => `<td class="border border-white bg-slate-100 px-2 py-2"><input class="matrix-score w-16 rounded-lg border border-line bg-white px-2 py-1 text-center" data-score="${key}" type="number" min="1" max="5" value="" /></td>`).join('')}
+      <td class="matrix-total border border-white bg-sky-50 px-3 py-3 font-bold">0</td>
+    </tr>`;
+  }
+
+  function renderNoteCard(note) {
+    const canEdit = state.user.role === 'teacher' || note.actorId === state.user.id;
+    const tone = noteTone(note);
+    return `
+      <article class="note-card rounded-[20px] border ${tone.border} ${tone.bg} p-4 shadow-soft" data-note-id="${note.id}">
+        <p class="min-h-14 whitespace-pre-wrap text-sm font-semibold leading-6 text-slate-700">${escapeHtml(note.text)}</p>
+        <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-muted">
+          <span class="inline-flex items-center gap-2"><span class="grid h-7 w-7 place-items-center rounded-full bg-paper font-bold text-ink">${escapeHtml(note.author).slice(0, 1)}</span>${escapeHtml(note.author)}</span>
+          <span>${formatTime(note.timestamp)}${note.editedAt ? ' · 수정됨' : ''}</span>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-2 text-xs font-bold">
+          <button data-note-action="like" data-note-id="${note.id}" class="rounded-full bg-rose/10 px-3 py-1 text-rose">♥ ${note.likes?.length || 0}</button>
+          <button data-note-action="reply" data-note-id="${note.id}" class="rounded-full bg-white px-3 py-1 text-ocean shadow-insetLine">답글</button>
+          ${canEdit ? `<button data-note-action="edit" data-note-id="${note.id}" class="rounded-full bg-white px-3 py-1 text-muted shadow-insetLine">수정</button><button data-note-action="delete" data-note-id="${note.id}" class="rounded-full bg-white px-3 py-1 text-rose shadow-insetLine">삭제</button>` : ''}
+        </div>
+        ${(note.replies || []).length ? `<div class="mt-3 space-y-2">${note.replies.map((reply) => `<div class="rounded-xl bg-paper p-3 text-xs leading-5"><strong>${escapeHtml(reply.author)}</strong> ${escapeHtml(reply.text)}</div>`).join('')}</div>` : ''}
+      </article>
+    `;
+  }
+
+  function noteTone(note) {
+    const map = {
+      problem_exploration: note.mode === 'divergence'
+        ? { bg: 'bg-sky-50', border: 'border-sky-200' }
+        : { bg: 'bg-blue-50', border: 'border-blue-300' },
+      idea_generation: note.mode === 'divergence'
+        ? { bg: 'bg-yellow-50', border: 'border-yellow-300' }
+        : { bg: 'bg-amber-50', border: 'border-amber-300' },
+      solution_design: note.mode === 'divergence'
+        ? { bg: 'bg-emerald-50', border: 'border-emerald-300' }
+        : { bg: 'bg-teal-50', border: 'border-teal-300' },
+      action_planning: note.mode === 'divergence'
+        ? { bg: 'bg-violet-50', border: 'border-violet-300' }
+        : { bg: 'bg-purple-50', border: 'border-purple-300' }
+    };
+    return map[note.stage] || { bg: 'bg-white', border: 'border-line' };
+  }
+
+  function renderAiPanel() {
+    const usage = state.projectState.aiUsage?.byStage || {};
+    $('aiUsageBars').innerHTML = stages.map((stage) => {
+      const used = Math.min(5, usage[stage.id] || 0);
+      return `<div class="rounded-2xl bg-paper p-3">
+        <div class="flex justify-between text-xs font-bold"><span>${stage.label}</span><span>${used}/5</span></div>
+        <div class="mt-2 flex gap-1">${Array.from({ length: 5 }, (_, i) => `<span class="h-2 flex-1 rounded-full ${i < used ? 'bg-violet' : 'bg-slate-200'}"></span>`).join('')}</div>
+      </div>`;
+    }).join('');
+    $('aiLockBadge').innerHTML = '<span class="inline-flex items-center gap-1"><i data-lucide="sparkles" class="h-3.5 w-3.5"></i>활성화</span>';
+    $('aiGate').textContent = 'AI 도움은 단계별 사용자당 5회까지 사용할 수 있습니다.';
+    const latest = (state.projectState.aiFeed || [])[0];
+    $('aiFeed').innerHTML = latest
+      ? `<article class="rounded-2xl bg-white p-4 text-sm leading-6 shadow-soft"><strong class="text-violet">AI</strong><p class="mt-2 whitespace-pre-wrap text-muted">${escapeHtml(compactAiText(latest.text))}</p></article>`
+      : '<article class="rounded-2xl bg-white p-4 text-sm leading-6 text-muted shadow-insetLine">요약, 질문, 빠진 관점, 자기점검 중 하나를 선택하면 이곳에 표시됩니다.</article>';
+  }
+
+  function compactAiText(text) {
+    const lines = String(text || '').split('\n');
+    const stopAt = lines.findIndex((line, index) =>
+      index > 0 && /^(반복 의견|빠진 관점|추가 탐색 질문|자기점검)/.test(line)
+    );
+    return (stopAt > 0 ? lines.slice(0, stopAt) : lines).join('\n');
+  }
+
+  function renderTeamAwareness() {
+    const team = state.projectState.teams?.find((item) => item.name === state.user.team) || state.projectState.teams?.[0];
+    $('studentAwarenessList').innerHTML = (team?.members || []).map((member) => `<div class="flex items-center justify-between rounded-xl bg-paper p-3 text-sm"><span>${escapeHtml(member.name)} ${badges(member.badges)}</span><strong>${member.eventCount}</strong></div>`).join('');
+    $('studentBalanceRatio').textContent = `${team?.temperature || 32}°C`;
+    $('studentBalanceBar').innerHTML = `<div class="bg-teal" style="width:${Math.min(100, ((team?.temperature || 32) - 30) * 10)}%"></div>`;
+  }
+
+  function renderArtifactTimeline() {
+    const revisions = state.projectState.revisions || [];
+    $('artifactTimeline').innerHTML = revisions.slice(0, 6).map((revision) => `
+      <button class="relative z-10 rounded-2xl bg-white p-3 text-center shadow-insetLine" data-version="${escapeHtml(revision.version)}" data-version-note="${escapeHtml(revision.note)}">
+        <div class="mx-auto grid h-8 w-8 place-items-center rounded-full bg-ink text-white"><i data-lucide="git-commit-horizontal" class="h-4 w-4"></i></div>
+        <p class="mt-2 text-xs font-bold">${escapeHtml(revision.version)}</p>
+        <p class="mt-1 text-[11px] text-muted">${escapeHtml(revision.by)} · Δ${revision.delta}</p>
+      </button>
+    `).join('') || emptyCard('아직 산출물 수정 기록이 없습니다.');
+  }
+
+  function renderTeacherDashboard() {
+    if (state.user.role !== 'teacher') return;
+    const teams = state.projectState.teams || [];
+    const active = teams.filter((team) => team.active).length;
+    const aiTotal = teams.reduce((sum, team) => sum + team.aiTotal, 0);
+    const avgTemp = teams.length ? (teams.reduce((sum, team) => sum + team.temperature, 0) / teams.length).toFixed(1) : '32.0';
+    $('metricEvents').textContent = teams.length;
+    $('metricUnlock').textContent = active;
+    $('metricRatio').textContent = `${avgTemp}°C`;
+    $('teacherSummary').innerHTML = summaryCard('총 팀 수', teams.length, 'users') + summaryCard('현재 활성 팀', active, 'radio') + summaryCard('전체 AI 사용량', aiTotal, 'sparkles') + summaryCard('평균 협동 온도', `${avgTemp}°C`, 'thermometer');
+    $('teamCards').innerHTML = teams.map((team) => `
+      <article class="rounded-[24px] bg-white/88 p-5 shadow-insetLine">
+        <div class="flex items-start justify-between"><h3 class="text-xl font-semibold">${team.name}</h3><span class="rounded-full bg-yellow-200 px-3 py-1 text-xs font-bold">${team.temperature}°C</span></div>
+        <p class="mt-3 text-sm text-muted">현재 단계: <strong class="text-ink">${stageName(team.currentStage)}</strong></p>
+        <p class="mt-1 text-sm text-muted">AI 사용량: <strong class="text-ink">${team.aiTotal}/5</strong></p>
+        <button class="mt-4 rounded-xl bg-ink px-4 py-2 text-sm font-bold text-white" data-team-view="${team.name}">팀 보기</button>
+      </article>
+    `).join('');
+    renderTeacherDetail();
+    renderAiVisualization();
+    renderRoster();
+    renderCharts();
+  }
+
+  function summaryCard(label, value, icon) {
+    return `<article class="rounded-[24px] bg-white/88 p-5 shadow-insetLine"><div class="flex items-center justify-between"><p class="text-sm text-muted">${label}</p><i data-lucide="${icon}" class="h-5 w-5 text-muted"></i></div><p class="mt-3 text-3xl font-semibold">${value}</p></article>`;
+  }
+
+  function renderTeacherDetail() {
+    const team = state.projectState.teams?.find((item) => item.name === state.selectedTeacherTeam) || state.projectState.teams?.[0];
+    const notes = (state.projectState.notes || []).filter((note) => note.teamId === team?.name);
+    const ai = (state.projectState.aiFeed || []).slice(0, 4);
+    const events = (state.projectState.events || []).filter((event) => event.teamId === team?.name).slice(0, 5);
+    $('teacherTeamDetail').innerHTML = team ? `
+      <div class="rounded-[26px] bg-ink p-5 text-white">
+        <div class="flex items-center justify-between"><h3 class="text-xl font-semibold">${team.name} 미니 보기</h3><span>${team.temperature}°C</span></div>
+        <p class="mt-2 text-sm text-slate-300">현재 단계: ${stageName(team.currentStage)}</p>
+        <div class="mt-4 grid gap-3 md:grid-cols-2">
+          <div class="rounded-2xl bg-white/10 p-4"><strong>작성 중인 아이디어</strong><p class="mt-2 text-sm text-slate-300">${notes.filter((n) => n.mode === 'divergence').slice(0, 3).map((n) => escapeHtml(n.text)).join('<br>') || '없음'}</p></div>
+          <div class="rounded-2xl bg-white/10 p-4"><strong>수렴 결과</strong><p class="mt-2 text-sm text-slate-300">${notes.filter((n) => n.mode === 'convergence').slice(0, 3).map((n) => escapeHtml(n.text)).join('<br>') || '없음'}</p></div>
+          <div class="rounded-2xl bg-white/10 p-4"><strong>AI 도움</strong><p class="mt-2 text-sm text-slate-300">${ai.map((a) => formatTime(a.timestamp)).join(', ') || '없음'}</p></div>
+          <div class="rounded-2xl bg-white/10 p-4"><strong>최근 로그</strong><p class="mt-2 text-sm text-slate-300">${events.map((e) => eventName(e.eventType)).join('<br>') || '없음'}</p></div>
+        </div>
+        <div class="mt-4 rounded-2xl bg-white/10 p-4">
+          <strong>교수자 피드백 입력</strong>
+          <div class="mt-3 grid gap-2 md:grid-cols-[160px_1fr_auto]">
+            <select id="teacherFeedbackStage" class="rounded-xl border border-white/20 bg-white px-3 py-2 text-sm text-ink">
+              <option value="solution_design">해결안 구안</option>
+              <option value="action_planning">실행 계획 수립</option>
+            </select>
+            <input id="teacherFeedbackInput" class="rounded-xl border border-white/20 bg-white px-3 py-2 text-sm text-ink" placeholder="팀에 전달할 피드백을 입력하세요." />
+            <button id="sendTeacherFeedback" class="rounded-xl bg-yellow-300 px-4 py-2 text-sm font-bold text-ink" data-feedback-team="${team.name}">전송</button>
+          </div>
+        </div>
+      </div>` : '';
+  }
+
+  function renderAiVisualization() {
+    const teams = state.projectState.teams || [];
+    const totalByStage = Object.fromEntries(stages.map((stage) => [stage.id, teams.reduce((sum, team) => sum + (team.aiByStage?.[stage.id] || 0), 0)]));
+    const maxStage = stages.slice().sort((a, b) => totalByStage[b.id] - totalByStage[a.id])[0];
+    $('aiStageUsage').innerHTML = stages.map((stage) => {
+      const used = Math.min(5, totalByStage[stage.id]);
+      return `<div class="rounded-2xl bg-white/88 p-4 shadow-insetLine"><div class="flex justify-between text-sm font-bold"><span>${stage.label}</span><span>${used}/5</span></div><div class="mt-2 flex gap-1">${Array.from({ length: 5 }, (_, i) => `<span class="h-3 flex-1 rounded-full ${i < used ? 'bg-violet' : 'bg-slate-200'}"></span>`).join('')}</div></div>`;
+    }).join('');
+    $('aiBiasWarning').textContent = totalByStage[maxStage.id] >= 4 ? `AI 사용이 ${maxStage.label} 단계에 집중되어 있음` : 'AI 사용 편향 경고 없음';
+  }
+
+  function renderRoster() {
+    $('studentRosterCount').textContent = `${state.projectState.roster?.length || 0}명`;
+    $('studentRosterList').innerHTML = (state.projectState.roster || []).map((student) => `<article class="rounded-2xl bg-paper p-4"><h3 class="font-semibold">${escapeHtml(student.name)} ${badges(student.badges)}</h3><p class="mt-2 text-xs text-muted">${student.team} · 이벤트 ${student.eventCount}개 · 분당 ${student.rate.toFixed(2)}개</p></article>`).join('');
+  }
+
+  function renderEvents() {
+    const events = state.projectState.events || [];
+    $('eventTimeline').innerHTML = stages.map((stage) => {
+      const logs = events.filter((event) => event.cpsStage === stage.id).slice(0, 8);
+      return `<div class="rounded-[22px] bg-paper p-4"><h3 class="font-semibold">${stage.label} 로그</h3><div class="mt-3 space-y-2">${logs.map((event) => `<div class="rounded-xl bg-white p-3 text-xs"><strong>${eventName(event.eventType)}</strong> · ${escapeHtml(event.actorName || '')} · ${formatTime(event.timestamp, true)}</div>`).join('') || '<p class="text-sm text-muted">로그 없음</p>'}</div></div>`;
+    }).join('');
+  }
+
+  function renderCharts() {
+    if (!window.Chart) return;
+    destroyCharts();
+    const teams = state.projectState.teams || [];
+    state.charts.temperature = new Chart($('memberChart'), {
+      type: 'bar',
+      data: { labels: teams.map((t) => t.name), datasets: [{ label: '협동 온도', data: teams.map((t) => t.temperature), backgroundColor: '#facc15' }] },
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, max: 45 } } }
+    });
+    state.charts.ai = new Chart($('ratioChart'), {
+      type: 'doughnut',
+      data: { labels: stages.map((s) => s.label), datasets: [{ data: stages.map((s) => teams.reduce((sum, t) => sum + (t.aiByStage?.[s.id] || 0), 0)), backgroundColor: ['#2563eb', '#7c3aed', '#0f9f8f', '#d97706'] }] },
+      options: { plugins: { legend: { position: 'bottom' } } }
+    });
+    state.charts.rate = new Chart($('rateChart'), {
+      type: 'bar',
+      data: { labels: state.projectState.roster.map((r) => r.name), datasets: [{ label: '분당 이벤트 수', data: state.projectState.roster.map((r) => Number(r.rate.toFixed(2))), backgroundColor: '#0f9f8f' }] },
+      options: { plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
+    });
+  }
+
+  function destroyCharts() {
+    Object.values(state.charts).forEach((chart) => chart?.destroy?.());
+    state.charts = {};
+  }
+
+  async function addNote(mode, text = null) {
     const input = mode === 'divergence' ? $('divergenceInput') : $('convergenceInput');
-    const text = input.value.trim();
-    if (!text) return;
+    const value = (text ?? input.value).trim();
+    if (!value) return;
     const data = await api(`/api/projects/${state.currentProject.id}/notes`, {
       method: 'POST',
-      body: JSON.stringify({ text, mode, stage: stages[state.currentStage].id })
+      body: JSON.stringify({ text: value, mode, stage: stages[state.currentStage].id })
     });
     input.value = '';
     state.projectState = data.state;
     renderAll();
   }
 
-  function findNote(noteId) {
-    return (state.projectState.notes || []).find((note) => note.id === noteId);
-  }
-
-  async function editNote(noteId) {
-    const note = findNote(noteId);
-    if (!note) return;
-    const text = window.prompt('노트 내용을 수정하세요.', note.text);
-    if (text === null || !text.trim()) return;
-    const data = await api(`/api/projects/${state.currentProject.id}/notes/${noteId}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ text: text.trim() })
-    });
-    state.projectState = data.state;
-    renderAll();
-  }
-
-  async function deleteNote(noteId) {
-    const note = findNote(noteId);
-    if (!note) return;
-    if (!window.confirm('이 노트를 삭제할까요? 답글도 함께 삭제됩니다.')) return;
-    const data = await api(`/api/projects/${state.currentProject.id}/notes/${noteId}`, {
-      method: 'DELETE'
-    });
-    state.projectState = data.state;
-    renderAll();
-  }
-
-  async function replyToNote(noteId) {
-    const note = findNote(noteId);
-    if (!note) return;
-    const text = window.prompt('답글을 입력하세요.');
-    if (text === null || !text.trim()) return;
-    const data = await api(`/api/projects/${state.currentProject.id}/notes/${noteId}/replies`, {
+  async function logEvent(eventType, payload = {}, mode = state.activePhase, stage = stages[state.currentStage].id) {
+    const data = await api(`/api/projects/${state.currentProject.id}/events`, {
       method: 'POST',
-      body: JSON.stringify({ text: text.trim() })
+      body: JSON.stringify({ eventType, cpsStage: stage, activityMode: mode, payload })
     });
     state.projectState = data.state;
     renderAll();
   }
 
-  async function requestAI(key, trigger) {
-    if (!state.projectState.aiUnlock?.unlocked) return;
-    const data = await api(`/api/projects/${state.currentProject.id}/ai`, {
+  async function logEventSilent(eventType, payload = {}, mode = state.activePhase, stage = stages[state.currentStage].id) {
+    await api(`/api/projects/${state.currentProject.id}/events`, {
       method: 'POST',
-      body: JSON.stringify({ key, trigger, cpsStage: stages[state.currentStage].id })
+      body: JSON.stringify({ eventType, cpsStage: stage, activityMode: mode, payload })
     });
-    state.projectState = data.state;
-    $('aiResponse').textContent = data.response;
+  }
+
+  async function requestAI(key = 'summary') {
+    const stage = stages[state.currentStage].id;
+    try {
+      const data = await api(`/api/projects/${state.currentProject.id}/ai`, {
+        method: 'POST',
+        body: JSON.stringify({ key, cpsStage: stage, activityMode: state.activePhase, trigger: key })
+      });
+      state.projectState = data.state;
+      $('aiResponse').textContent = data.response;
+      renderAll();
+    } catch (error) {
+      $('aiResponse').textContent = error.message;
+    }
+  }
+
+  async function noteAction(action, noteId) {
+    const note = (state.projectState.notes || []).find((item) => item.id === noteId);
+    if (!note) return;
+    if (action === 'edit') {
+      const text = window.prompt('노트 내용을 수정하세요.', note.text);
+      if (!text?.trim()) return;
+      state.projectState = (await api(`/api/projects/${state.currentProject.id}/notes/${noteId}`, { method: 'PATCH', body: JSON.stringify({ text: text.trim() }) })).state;
+    }
+    if (action === 'delete') {
+      if (!window.confirm('이 카드를 삭제할까요?')) return;
+      state.projectState = (await api(`/api/projects/${state.currentProject.id}/notes/${noteId}`, { method: 'DELETE' })).state;
+    }
+    if (action === 'reply') {
+      const text = window.prompt('답글을 입력하세요.');
+      if (!text?.trim()) return;
+      state.projectState = (await api(`/api/projects/${state.currentProject.id}/notes/${noteId}/replies`, { method: 'POST', body: JSON.stringify({ text: text.trim() }) })).state;
+    }
+    if (action === 'like' || action === 'select') {
+      state.projectState = (await api(`/api/projects/${state.currentProject.id}/notes/${noteId}/${action}`, { method: 'POST' })).state;
+    }
     renderAll();
   }
 
-  function badge(text) {
-    return `<span class="rounded-full bg-white px-3 py-1 shadow-insetLine">${escapeHtml(text)}</span>`;
+  async function saveProblemDefinition() {
+    const user = $('problemUserInput')?.value.trim();
+    const pain = $('problemPainInput')?.value.trim();
+    const reason = $('problemReasonInput')?.value.trim();
+    const hmw = $('problemHmwInput')?.value.trim();
+    if (!user || !pain || !reason) return;
+    const hmwText = hmw || `어떻게 하면 ${user}가 ${pain.replace('어려움을 겪는다', '쉽게 해결할 수 있을까')}?`;
+    await addNote('convergence', `${user}는 ${pain}.\n왜냐하면 ${reason} 때문이다.\n\nHMW: ${hmwText}`);
   }
 
-  function formatTime(value, withSeconds = false) {
-    if (!value) return '';
-    return new Date(value).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', ...(withSeconds ? { second: '2-digit' } : {}) });
+  async function saveDecisionMatrix() {
+    const rows = [...document.querySelectorAll('[data-matrix-note]')].map((row) => {
+      const scores = [...row.querySelectorAll('.matrix-score')].map((input) => Number(input.value || 0));
+      return { noteId: row.dataset.matrixNote, scores, total: scores.reduce((a, b) => a + b, 0) };
+    });
+    const picked = rows.slice().sort((a, b) => b.total - a.total)[0]?.noteId;
+    state.projectState = (await api(`/api/projects/${state.currentProject.id}/decision`, { method: 'POST', body: JSON.stringify({ stage: 'idea_generation', matrix: rows, selectedNoteId: picked }) })).state;
+    renderAll();
+  }
+
+  function recalcMatrix() {
+    document.querySelectorAll('[data-matrix-note]').forEach((row) => {
+      const total = [...row.querySelectorAll('.matrix-score')].reduce((sum, input) => sum + Number(input.value || 0), 0);
+      row.querySelector('.matrix-total').textContent = total;
+    });
+  }
+
+  function badges(values = []) {
+    const map = { idea: '💡', empathy: '❤️', explorer: '🔍', connector: '🔗', listener: '👂' };
+    return values.map((value) => map[value] || '').join('');
+  }
+
+  function emptyCard(text) {
+    return `<div class="rounded-[22px] border border-dashed border-line bg-white/72 p-6 text-sm text-muted">${text}</div>`;
   }
 
   function escapeHtml(value) {
-    return String(value ?? '')
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll("'", '&#039;');
+    return String(value ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
   }
 
-  document.querySelectorAll('[data-role-select]').forEach((button) => {
-    button.addEventListener('click', () => chooseRole(button.dataset.roleSelect));
-  });
+  function formatTime(value, seconds = false) {
+    if (!value) return '';
+    return new Date(value).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', ...(seconds ? { second: '2-digit' } : {}) });
+  }
+
+  document.querySelectorAll('[data-role-select]').forEach((button) => button.addEventListener('click', () => chooseRole(button.dataset.roleSelect)));
   $('backToRoleFromLogin').addEventListener('click', () => showScreen('roleScreen'));
   $('backToRole').addEventListener('click', () => showScreen('roleScreen'));
   $('loginBtn').addEventListener('click', login);
-  $('loginPassword').addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') login();
-  });
+  $('loginPassword').addEventListener('keydown', (event) => { if (event.key === 'Enter') login(); });
   $('createProjectBtn').addEventListener('click', () => $('createProjectPanel').classList.toggle('hidden'));
   $('saveProjectBtn').addEventListener('click', createProject);
-
-  document.querySelectorAll('.phase-btn').forEach((btn) => {
-    btn.addEventListener('click', async () => {
-      state.activePhase = btn.dataset.phase;
-      await addEvent('phase_switch', { mode: state.activePhase, source: 'phase_tab' }, state.activePhase);
-    });
-  });
-  $('prevStageBtn').addEventListener('click', async () => {
-    if (state.currentStage === 0) return;
-    const previous = stages[state.currentStage].id;
-    state.currentStage -= 1;
-    await addEvent('cps_stage_transition', { fromStage: previous, toStage: stages[state.currentStage].id, direction: 'previous' }, 'convergence');
-  });
-  $('nextStageBtn').addEventListener('click', async () => {
-    if (state.currentStage === stages.length - 1) return;
-    const previous = stages[state.currentStage].id;
-    state.currentStage += 1;
-    await addEvent('cps_stage_transition', { fromStage: previous, toStage: stages[state.currentStage].id, direction: 'next' }, 'convergence');
-  });
+  $('expandCanvasBtn').addEventListener('click', () => { state.canvasExpanded = !state.canvasExpanded; renderAll(); });
+  $('phaseDivergeBtn').addEventListener('click', () => { state.activePhase = 'divergence'; logEvent('button_clicked', { target: 'divergence_tab' }, 'divergence'); renderAll(); });
+  $('phaseConvergeBtn').addEventListener('click', () => { state.activePhase = 'convergence'; logEvent('button_clicked', { target: 'convergence_tab' }, 'convergence'); renderAll(); });
   $('addDivergence').addEventListener('click', () => addNote('divergence'));
   $('addConvergence').addEventListener('click', () => addNote('convergence'));
-  ['divergenceCards', 'convergenceCards'].forEach((containerId) => {
-    $(containerId).addEventListener('click', (event) => {
-      const button = event.target.closest('[data-note-action]');
-      if (!button) return;
-      const { noteAction, noteId } = button.dataset;
-      if (noteAction === 'edit') editNote(noteId);
-      if (noteAction === 'delete') deleteNote(noteId);
-      if (noteAction === 'reply') replyToNote(noteId);
-    });
-  });
-  $('studentHelpBtn').addEventListener('click', () => {
-    const keys = ['perspective', 'counter', 'elaborate', 'criteria'];
-    requestAI(keys[(state.projectState.events.length + state.currentStage) % keys.length], 'student_help_button');
-  });
-  document.querySelectorAll('.ai-btn').forEach((btn) => {
-    btn.addEventListener('click', () => requestAI(btn.dataset.ai, 'ai_scaffold_panel'));
-  });
-  $('reviseArtifact').addEventListener('click', () => addEvent('artifact_revision_event', { artifactId: 'artifact-01' }, 'convergence'));
-  $('interventionBtn').addEventListener('click', () => addEvent('collaboration_event', {
-    action: 'instructor_intervention_suggestion',
-    suggestion: 'AI 사용 전 학생 아이디어를 먼저 10개 이상 생성하도록 팀 규칙을 조정'
-  }, 'convergence'));
-  $('exportLog').addEventListener('click', () => {
-    $('jsonOutput').textContent = JSON.stringify(state.projectState.events, null, 2);
-    $('jsonModal').classList.remove('hidden');
-  });
-  $('closeModal').addEventListener('click', () => $('jsonModal').classList.add('hidden'));
+  $('reviseArtifact').addEventListener('click', () => logEvent('artifact_revision_event', { summary: '산출물 버전 생성', detail: '팀 논의를 반영해 버전을 생성했습니다.' }, 'convergence'));
+  $('studentHelpBtn').addEventListener('click', () => requestAI('stage_help'));
+  document.querySelectorAll('.ai-btn').forEach((button) => button.addEventListener('click', () => requestAI(button.dataset.ai)));
 
-  if (window.lucide) lucide.createIcons();
+  document.body.addEventListener('click', (event) => {
+    const noteButton = event.target.closest('[data-note-action]');
+    if (noteButton) noteAction(noteButton.dataset.noteAction, noteButton.dataset.noteId);
+    const teamButton = event.target.closest('[data-team-view]');
+    if (teamButton) { state.selectedTeacherTeam = teamButton.dataset.teamView; renderTeacherDetail(); }
+    const promptButton = event.target.closest('[data-fill-prompt]');
+    if (promptButton) $(state.activePhase === 'convergence' ? 'convergenceInput' : 'divergenceInput').value = promptButton.dataset.fillPrompt;
+    const versionButton = event.target.closest('[data-version]');
+    if (versionButton) window.alert(`${versionButton.dataset.version}\n${versionButton.dataset.versionNote}`);
+    if (event.target.id === 'saveProblemDefinition') saveProblemDefinition();
+    if (event.target.id === 'saveDecisionMatrix') saveDecisionMatrix();
+    if (event.target.id === 'sendTeacherFeedback') sendTeacherFeedback(event.target.dataset.feedbackTeam);
+    const checkButton = event.target.closest('.check-prev, .check-next');
+    if (checkButton) moveCheckItem(checkButton.classList.contains('check-next') ? 1 : -1);
+  });
+  document.body.addEventListener('input', (event) => {
+    if (event.target.classList.contains('matrix-score')) recalcMatrix();
+    if (event.target.matches('textarea,input')) {
+      clearTimeout(state.inputLogTimer);
+      state.inputLogTimer = setTimeout(() => logEventSilent('input_event', { id: event.target.id || 'field' }).catch(() => {}), 1200);
+    }
+  });
+
+  function moveCheckItem(direction) {
+    const carousel = document.querySelector('.check-carousel');
+    if (!carousel) return;
+    const items = [...carousel.querySelectorAll('[data-check-item]')];
+    if (!items.length) return;
+    const current = Number(carousel.dataset.checkIndex || 0);
+    const next = (current + direction + items.length) % items.length;
+    carousel.dataset.checkIndex = String(next);
+    items.forEach((item, index) => item.classList.toggle('hidden', index !== next));
+  }
+
+  async function sendTeacherFeedback(teamName) {
+    const input = $('teacherFeedbackInput');
+    const stage = $('teacherFeedbackStage')?.value || 'solution_design';
+    const feedback = input?.value.trim();
+    if (!feedback) return;
+    await logEvent('teacher_feedback', { teamName, feedback }, 'convergence', stage);
+    input.value = '';
+  }
+
+  iconRefresh();
 });

@@ -1,33 +1,33 @@
 {
   "meta": {
-    "eventSeq": 25,
-    "noteSeq": 4,
-    "revisionSeq": 3
+    "eventSeq": 49,
+    "noteSeq": 15,
+    "revisionSeq": 4
   },
   "projects": [
     {
       "id": "project-1",
-      "name": "학교 공간 개선 프로젝트",
-      "topic": "학생들이 쉬는 시간을 더 잘 보낼 수 있는 학교 공간 만들기",
+      "name": "대학생 과제 관리 서비스",
+      "topic": "여러 플랫폼에 흩어진 과제와 일정을 한곳에서 관리하는 서비스 설계",
       "teams": 4,
       "createdBy": "system",
-      "createdAt": "2026-05-20T15:53:30.506Z"
+      "createdAt": "2026-06-04T15:08:03.499Z"
     },
     {
       "id": "project-2",
-      "name": "지역 문제 해결 프로젝트",
-      "topic": "우리 동네에서 발견한 불편함을 해결하는 서비스 제안",
-      "teams": 3,
+      "name": "학교 휴게 공간 혼잡도 안내 서비스",
+      "topic": "학생들이 쉬는 시간에 사용할 수 있는 공간을 쉽게 찾도록 돕는 서비스 설계",
+      "teams": 4,
       "createdBy": "system",
-      "createdAt": "2026-05-20T15:53:30.506Z"
+      "createdAt": "2026-06-04T15:08:03.499Z"
     },
     {
       "id": "project-3",
-      "name": "친환경 생활 실천 프로젝트",
-      "topic": "교실에서 실천할 수 있는 자원 절약 방법 설계",
-      "teams": 5,
+      "name": "지역 상권 접근성 개선 프로젝트",
+      "topic": "지역 주민과 학생이 주변 상점을 더 쉽게 이용할 수 있는 안내 경험 설계",
+      "teams": 4,
       "createdBy": "system",
-      "createdAt": "2026-05-20T15:53:30.506Z"
+      "createdAt": "2026-06-04T15:08:03.499Z"
     }
   ],
   "states": {
@@ -39,9 +39,14 @@
           "mode": "divergence",
           "author": "김민서",
           "actorId": "stu-01",
-          "teamId": "Team A",
-          "text": "쉬는 시간에 앉아서 이야기할 수 있는 공간이 부족하다.",
-          "timestamp": "2026-05-21T13:53:30.506Z"
+          "teamId": "1조",
+          "text": "대학생은 과제 공지가 LMS, 메신저, 이메일에 흩어져 있어 마감일을 놓치기 쉽다.",
+          "replies": [],
+          "likes": [
+            "stu-02",
+            "stu-03"
+          ],
+          "timestamp": "2026-06-04T14:58:03.499Z"
         },
         {
           "id": "note-2",
@@ -49,485 +54,1146 @@
           "mode": "divergence",
           "author": "이준호",
           "actorId": "stu-02",
-          "teamId": "Team A",
-          "text": "복도와 계단 주변에 학생들이 몰려 이동이 불편하다.",
-          "timestamp": "2026-05-21T13:59:30.506Z"
+          "teamId": "1조",
+          "text": "팀플 일정과 개인 과제 일정이 서로 겹칠 때 우선순위를 정하기 어렵다.",
+          "replies": [],
+          "likes": [],
+          "timestamp": "2026-06-04T14:48:03.499Z"
         },
         {
           "id": "note-3",
           "stage": "problem_exploration",
-          "mode": "convergence",
-          "author": "팀 합의",
+          "mode": "divergence",
+          "author": "박서연",
           "actorId": "stu-03",
-          "teamId": "Team A",
-          "text": "학생들이 짧은 쉬는 시간에 안전하게 머물 공간을 찾기 어렵다.",
-          "timestamp": "2026-05-21T14:08:30.506Z"
+          "teamId": "1조",
+          "text": "새로운 수업 플랫폼을 매번 확인해야 해서 피로감이 크다.",
+          "replies": [],
+          "likes": [],
+          "timestamp": "2026-06-04T14:38:03.499Z"
+        },
+        {
+          "id": "note-4",
+          "stage": "problem_exploration",
+          "mode": "convergence",
+          "author": "박서연",
+          "actorId": "stu-03",
+          "teamId": "1조",
+          "text": "대학생은 과제 관리에 어려움을 겪는다.\n왜냐하면 여러 플랫폼에 일정과 제출물이 흩어져 있기 때문이다.\n\nHMW: 어떻게 하면 대학생이 여러 플랫폼을 오가지 않고 오늘 해야 할 과제를 바로 파악할 수 있을까?",
+          "replies": [],
+          "likes": [],
+          "timestamp": "2026-06-04T14:28:03.499Z"
+        },
+        {
+          "id": "note-5",
+          "stage": "idea_generation",
+          "mode": "divergence",
+          "author": "김민서",
+          "actorId": "stu-01",
+          "teamId": "1조",
+          "text": "모든 과제 마감일을 자동으로 모아 보여주는 통합 캘린더",
+          "replies": [
+            {
+              "id": "reply-1",
+              "author": "이준호",
+              "actorId": "stu-02",
+              "text": "자동 수집이 어렵다면 처음에는 학생이 직접 추가하는 방식으로 시작해도 좋겠습니다.",
+              "timestamp": "2026-06-04T15:01:03.499Z"
+            }
+          ],
+          "likes": [
+            "stu-02"
+          ],
+          "timestamp": "2026-06-04T14:18:03.499Z"
+        },
+        {
+          "id": "note-6",
+          "stage": "idea_generation",
+          "mode": "divergence",
+          "author": "이준호",
+          "actorId": "stu-02",
+          "teamId": "1조",
+          "text": "마감 임박 과제를 색상과 알림으로 알려주는 우선순위 보드",
+          "replies": [],
+          "likes": [],
+          "timestamp": "2026-06-04T14:08:03.499Z"
+        },
+        {
+          "id": "note-7",
+          "stage": "idea_generation",
+          "mode": "divergence",
+          "author": "박서연",
+          "actorId": "stu-03",
+          "teamId": "1조",
+          "text": "팀플 역할과 개인 할 일을 함께 관리하는 공동 체크리스트",
+          "replies": [],
+          "likes": [],
+          "timestamp": "2026-06-04T13:58:03.499Z"
+        },
+        {
+          "id": "note-8",
+          "stage": "idea_generation",
+          "mode": "convergence",
+          "author": "김민서",
+          "actorId": "stu-01",
+          "teamId": "1조",
+          "text": "최종 선택 아이디어는 통합 캘린더와 우선순위 보드를 결합한 과제 관리 대시보드이다.",
+          "replies": [],
+          "likes": [],
+          "timestamp": "2026-06-04T13:48:03.499Z"
+        },
+        {
+          "id": "note-9",
+          "stage": "solution_design",
+          "mode": "divergence",
+          "author": "이준호",
+          "actorId": "stu-02",
+          "teamId": "1조",
+          "text": "웹앱 형태로 만들고, 첫 화면에는 오늘 할 일과 이번 주 마감 과제만 보여준다.",
+          "replies": [],
+          "likes": [],
+          "timestamp": "2026-06-04T13:38:03.499Z"
+        },
+        {
+          "id": "note-10",
+          "stage": "solution_design",
+          "mode": "divergence",
+          "author": "박서연",
+          "actorId": "stu-03",
+          "teamId": "1조",
+          "text": "프로토타입은 피그마 화면과 클릭 가능한 간단한 HTML로 제작할 수 있다.",
+          "replies": [],
+          "likes": [],
+          "timestamp": "2026-06-04T13:28:03.499Z"
+        },
+        {
+          "id": "note-11",
+          "stage": "solution_design",
+          "mode": "convergence",
+          "author": "김민서",
+          "actorId": "stu-01",
+          "teamId": "1조",
+          "text": "실제 제작 형태는 모바일 우선 웹 대시보드이며, 핵심 기능은 과제 자동 모음, 우선순위 표시, 완료 체크이다.",
+          "replies": [],
+          "likes": [],
+          "timestamp": "2026-06-04T13:18:03.499Z"
+        },
+        {
+          "id": "note-12",
+          "stage": "action_planning",
+          "mode": "divergence",
+          "author": "박서연",
+          "actorId": "stu-03",
+          "teamId": "1조",
+          "text": "사용자는 수업 직후 알림을 보고 오늘 해야 할 과제를 확인하는 상황을 테스트한다.",
+          "replies": [],
+          "likes": [],
+          "timestamp": "2026-06-04T13:08:03.499Z"
+        },
+        {
+          "id": "note-13",
+          "stage": "action_planning",
+          "mode": "convergence",
+          "author": "이준호",
+          "actorId": "stu-02",
+          "teamId": "1조",
+          "text": "테스트 기준은 첫 방문자가 1분 안에 가장 급한 과제를 찾고 완료 체크 방법을 설명할 수 있는지이다.",
+          "replies": [],
+          "likes": [],
+          "timestamp": "2026-06-04T12:58:03.499Z"
+        },
+        {
+          "id": "note-14",
+          "stage": "idea_generation",
+          "mode": "divergence",
+          "author": "최도윤",
+          "actorId": "stu-04",
+          "teamId": "2조",
+          "text": "위치 기반으로 학교 휴게 공간 혼잡도를 보여주는 지도",
+          "replies": [],
+          "likes": [],
+          "timestamp": "2026-06-04T12:48:03.499Z"
+        },
+        {
+          "id": "note-15",
+          "stage": "idea_generation",
+          "mode": "divergence",
+          "author": "정하린",
+          "actorId": "stu-05",
+          "teamId": "2조",
+          "text": "빈 강의실을 임시 학습 공간으로 예약하는 서비스",
+          "replies": [],
+          "likes": [],
+          "timestamp": "2026-06-04T12:38:03.499Z"
         }
       ],
       "events": [
         {
-          "eventId": "evt-0024",
-          "sessionId": "demo-session-2026-05-18",
+          "eventId": "evt-0049",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team B",
-          "actorId": "stu-04",
-          "actorName": "최도윤",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
           "actorRole": "learner",
-          "eventType": "artifact_revision_event",
+          "eventType": "stage_moved",
+          "cpsStage": "problem_exploration",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:30:26.142Z",
+          "payload": {
+            "from": "solution_design",
+            "to": "problem_exploration"
+          }
+        },
+        {
+          "eventId": "evt-0048",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:30:25.581Z",
+          "payload": {
+            "from": "action_planning",
+            "to": "solution_design"
+          }
+        },
+        {
+          "eventId": "evt-0047",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
           "cpsStage": "action_planning",
           "activityMode": "divergence",
-          "timestamp": "2026-05-21T15:50:30.506Z",
+          "timestamp": "2026-06-04T15:30:22.133Z",
           "payload": {
-            "mock": true
+            "target": "divergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0046",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:30:11.118Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0045",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:30:04.118Z",
+          "payload": {
+            "from": "solution_design",
+            "to": "action_planning"
+          }
+        },
+        {
+          "eventId": "evt-0044",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:30:00.366Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0043",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:29:54.415Z",
+          "payload": {
+            "from": "idea_generation",
+            "to": "solution_design"
+          }
+        },
+        {
+          "eventId": "evt-0042",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:29:45.454Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0041",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:29:42.758Z",
+          "payload": {
+            "from": "problem_exploration",
+            "to": "idea_generation"
+          }
+        },
+        {
+          "eventId": "evt-0040",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "problem_exploration",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:29:36.768Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0039",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "input_event",
+          "cpsStage": "problem_exploration",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:19:39.838Z",
+          "payload": {
+            "id": "problemReasonInput"
+          }
+        },
+        {
+          "eventId": "evt-0038",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "input_event",
+          "cpsStage": "problem_exploration",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:19:31.112Z",
+          "payload": {
+            "id": "problemPainInput"
+          }
+        },
+        {
+          "eventId": "evt-0037",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "input_event",
+          "cpsStage": "problem_exploration",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:19:26.589Z",
+          "payload": {
+            "id": "problemUserInput"
+          }
+        },
+        {
+          "eventId": "evt-0036",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "problem_exploration",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:17:05.781Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0035",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "problem_exploration",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:17:04.031Z",
+          "payload": {
+            "from": "idea_generation",
+            "to": "problem_exploration"
+          }
+        },
+        {
+          "eventId": "evt-0034",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:17:03.295Z",
+          "payload": {
+            "from": "solution_design",
+            "to": "idea_generation"
+          }
+        },
+        {
+          "eventId": "evt-0033",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:17:02.432Z",
+          "payload": {
+            "from": "action_planning",
+            "to": "solution_design"
+          }
+        },
+        {
+          "eventId": "evt-0032",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:15:30.790Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0031",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:15:28.818Z",
+          "payload": {
+            "from": "solution_design",
+            "to": "action_planning"
+          }
+        },
+        {
+          "eventId": "evt-0030",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:15:19.606Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0029",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:15:14.663Z",
+          "payload": {
+            "from": "idea_generation",
+            "to": "solution_design"
+          }
+        },
+        {
+          "eventId": "evt-0028",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:14:44.341Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0027",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:14:37.632Z",
+          "payload": {
+            "from": "problem_exploration",
+            "to": "idea_generation"
+          }
+        },
+        {
+          "eventId": "evt-0026",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "problem_exploration",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T15:14:08.030Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0025",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "ai-01",
+          "actorName": "AI 스캐폴드",
+          "actorRole": "ai_scaffold",
+          "eventType": "ai_interaction_event",
+          "cpsStage": "problem_exploration",
+          "activityMode": "divergence",
+          "timestamp": "2026-06-04T15:13:46.967Z",
+          "payload": {
+            "requesterId": "stu-01",
+            "trigger": "stage_help",
+            "key": "stage_help"
+          }
+        },
+        {
+          "eventId": "evt-0024",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "전체",
+          "actorId": "teacher-01",
+          "actorName": "김교수",
+          "actorRole": "instructor",
+          "eventType": "teacher_feedback",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T14:40:03.499Z",
+          "payload": {
+            "teamName": "1조",
+            "feedback": "테스트 성공 기준을 “좋았다”가 아니라 관찰 가능한 행동으로 적어보면 더 좋겠습니다."
           }
         },
         {
           "eventId": "evt-0023",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
-          "actorId": "stu-03",
-          "actorName": "박서연",
-          "actorRole": "learner",
-          "eventType": "idea_created",
-          "cpsStage": "action_planning",
-          "activityMode": "divergence",
-          "timestamp": "2026-05-21T15:47:30.506Z",
+          "teamId": "전체",
+          "actorId": "teacher-01",
+          "actorName": "김교수",
+          "actorRole": "instructor",
+          "eventType": "teacher_feedback",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T14:41:13.499Z",
           "payload": {
-            "mock": true
+            "teamName": "1조",
+            "feedback": "핵심 기능을 세 가지로 줄이고, 첫 화면에서 사용자가 가장 먼저 보는 정보를 더 명확히 정리해 보세요."
           }
         },
         {
           "eventId": "evt-0022",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
+          "teamId": "1조",
           "actorId": "ai-01",
-          "actorName": "AI 팀원",
+          "actorName": "AI 스캐폴드",
           "actorRole": "ai_scaffold",
-          "eventType": "phase_switch",
-          "cpsStage": "action_planning",
+          "eventType": "ai_interaction_event",
+          "cpsStage": "solution_design",
           "activityMode": "convergence",
-          "timestamp": "2026-05-21T15:44:30.506Z",
+          "timestamp": "2026-06-04T14:42:23.499Z",
           "payload": {
-            "mock": true
+            "requesterId": "stu-03",
+            "key": "check"
           }
         },
         {
           "eventId": "evt-0021",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
-          "actorId": "stu-01",
-          "actorName": "김민서",
-          "actorRole": "learner",
-          "eventType": "cps_stage_transition",
-          "cpsStage": "action_planning",
+          "teamId": "1조",
+          "actorId": "ai-01",
+          "actorName": "AI 스캐폴드",
+          "actorRole": "ai_scaffold",
+          "eventType": "ai_interaction_event",
+          "cpsStage": "idea_generation",
           "activityMode": "divergence",
-          "timestamp": "2026-05-21T15:41:30.506Z",
+          "timestamp": "2026-06-04T14:43:33.499Z",
           "payload": {
-            "mock": true
+            "requesterId": "stu-02",
+            "key": "missing"
           }
         },
         {
           "eventId": "evt-0020",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team B",
-          "actorId": "stu-04",
-          "actorName": "최도윤",
-          "actorRole": "learner",
+          "teamId": "1조",
+          "actorId": "ai-01",
+          "actorName": "AI 스캐폴드",
+          "actorRole": "ai_scaffold",
           "eventType": "ai_interaction_event",
-          "cpsStage": "action_planning",
+          "cpsStage": "problem_exploration",
           "activityMode": "divergence",
-          "timestamp": "2026-05-21T15:38:30.506Z",
+          "timestamp": "2026-06-04T14:44:43.499Z",
           "payload": {
-            "mock": true
+            "requesterId": "stu-01",
+            "key": "summary"
           }
         },
         {
           "eventId": "evt-0019",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
+          "teamId": "1조",
           "actorId": "stu-03",
           "actorName": "박서연",
           "actorRole": "learner",
-          "eventType": "artifact_revision_event",
-          "cpsStage": "action_planning",
-          "activityMode": "convergence",
-          "timestamp": "2026-05-21T15:35:30.506Z",
+          "eventType": "note_liked",
+          "cpsStage": "problem_exploration",
+          "activityMode": "divergence",
+          "timestamp": "2026-06-04T14:45:53.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-1"
           }
         },
         {
           "eventId": "evt-0018",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
+          "teamId": "1조",
           "actorId": "stu-02",
           "actorName": "이준호",
           "actorRole": "learner",
-          "eventType": "idea_created",
-          "cpsStage": "solution_design",
+          "eventType": "note_replied",
+          "cpsStage": "idea_generation",
           "activityMode": "divergence",
-          "timestamp": "2026-05-21T15:32:30.506Z",
+          "timestamp": "2026-06-04T14:47:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-5",
+            "replyId": "reply-1"
           }
         },
         {
           "eventId": "evt-0017",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
-          "actorId": "stu-01",
-          "actorName": "김민서",
+          "teamId": "1조",
+          "actorId": "stu-02",
+          "actorName": "이준호",
           "actorRole": "learner",
-          "eventType": "phase_switch",
-          "cpsStage": "solution_design",
-          "activityMode": "divergence",
-          "timestamp": "2026-05-21T15:29:30.506Z",
+          "eventType": "decision_matrix_used",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T14:48:13.499Z",
           "payload": {
-            "mock": true
+            "selectedNoteId": "note-7",
+            "matrix": [
+              {
+                "noteId": "note-5",
+                "scores": [
+                  5,
+                  4,
+                  3,
+                  4
+                ],
+                "total": 16
+              },
+              {
+                "noteId": "note-6",
+                "scores": [
+                  4,
+                  5,
+                  3,
+                  5
+                ],
+                "total": 17
+              },
+              {
+                "noteId": "note-7",
+                "scores": [
+                  4,
+                  4,
+                  5,
+                  5
+                ],
+                "total": 18
+              }
+            ]
           }
         },
         {
           "eventId": "evt-0016",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team B",
-          "actorId": "stu-04",
-          "actorName": "최도윤",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
           "actorRole": "learner",
-          "eventType": "cps_stage_transition",
+          "eventType": "artifact_revision_event",
           "cpsStage": "solution_design",
           "activityMode": "convergence",
-          "timestamp": "2026-05-21T15:26:30.506Z",
+          "timestamp": "2026-06-04T14:49:23.499Z",
           "payload": {
-            "mock": true
+            "summary": "문제 정의 초안",
+            "detail": "사용자와 원인 문장 구조로 문제를 정리했습니다."
           }
         },
         {
           "eventId": "evt-0015",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
-          "actorId": "ai-01",
-          "actorName": "AI 팀원",
-          "actorRole": "ai_scaffold",
-          "eventType": "ai_interaction_event",
-          "cpsStage": "solution_design",
+          "teamId": "2조",
+          "actorId": "stu-05",
+          "actorName": "정하린",
+          "actorRole": "learner",
+          "eventType": "idea_created",
+          "cpsStage": "idea_generation",
           "activityMode": "divergence",
-          "timestamp": "2026-05-21T15:23:30.506Z",
+          "timestamp": "2026-06-04T12:38:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-15",
+            "text": "빈 강의실을 임시 학습 공간으로 예약하는 서비스"
           }
         },
         {
           "eventId": "evt-0014",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
-          "actorId": "stu-02",
-          "actorName": "이준호",
+          "teamId": "2조",
+          "actorId": "stu-04",
+          "actorName": "최도윤",
           "actorRole": "learner",
-          "eventType": "artifact_revision_event",
-          "cpsStage": "solution_design",
+          "eventType": "idea_created",
+          "cpsStage": "idea_generation",
           "activityMode": "divergence",
-          "timestamp": "2026-05-21T15:20:30.506Z",
+          "timestamp": "2026-06-04T12:48:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-14",
+            "text": "위치 기반으로 학교 휴게 공간 혼잡도를 보여주는 지도"
           }
         },
         {
           "eventId": "evt-0013",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
-          "actorId": "stu-01",
-          "actorName": "김민서",
+          "teamId": "1조",
+          "actorId": "stu-02",
+          "actorName": "이준호",
           "actorRole": "learner",
-          "eventType": "idea_created",
-          "cpsStage": "solution_design",
+          "eventType": "convergence_note_created",
+          "cpsStage": "action_planning",
           "activityMode": "convergence",
-          "timestamp": "2026-05-21T15:17:30.506Z",
+          "timestamp": "2026-06-04T12:58:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-13",
+            "text": "테스트 기준은 첫 방문자가 1분 안에 가장 급한 과제를 찾고 완료 체크 방법을 설명할 수 있는지이다."
           }
         },
         {
           "eventId": "evt-0012",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team B",
-          "actorId": "stu-04",
-          "actorName": "최도윤",
+          "teamId": "1조",
+          "actorId": "stu-03",
+          "actorName": "박서연",
           "actorRole": "learner",
-          "eventType": "phase_switch",
-          "cpsStage": "idea_generation",
+          "eventType": "idea_created",
+          "cpsStage": "action_planning",
           "activityMode": "divergence",
-          "timestamp": "2026-05-21T15:14:30.506Z",
+          "timestamp": "2026-06-04T13:08:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-12",
+            "text": "사용자는 수업 직후 알림을 보고 오늘 해야 할 과제를 확인하는 상황을 테스트한다."
           }
         },
         {
           "eventId": "evt-0011",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
-          "actorId": "stu-03",
-          "actorName": "박서연",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
           "actorRole": "learner",
-          "eventType": "cps_stage_transition",
-          "cpsStage": "idea_generation",
-          "activityMode": "divergence",
-          "timestamp": "2026-05-21T15:11:30.506Z",
+          "eventType": "convergence_note_created",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T13:18:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-11",
+            "text": "실제 제작 형태는 모바일 우선 웹 대시보드이며, 핵심 기능은 과제 자동 모음, 우선순위 표시, 완료 체크이다."
           }
         },
         {
           "eventId": "evt-0010",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
-          "actorId": "stu-02",
-          "actorName": "이준호",
+          "teamId": "1조",
+          "actorId": "stu-03",
+          "actorName": "박서연",
           "actorRole": "learner",
-          "eventType": "ai_interaction_event",
-          "cpsStage": "idea_generation",
-          "activityMode": "convergence",
-          "timestamp": "2026-05-21T15:08:30.506Z",
+          "eventType": "idea_created",
+          "cpsStage": "solution_design",
+          "activityMode": "divergence",
+          "timestamp": "2026-06-04T13:28:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-10",
+            "text": "프로토타입은 피그마 화면과 클릭 가능한 간단한 HTML로 제작할 수 있다."
           }
         },
         {
           "eventId": "evt-0009",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
-          "actorId": "stu-01",
-          "actorName": "김민서",
+          "teamId": "1조",
+          "actorId": "stu-02",
+          "actorName": "이준호",
           "actorRole": "learner",
-          "eventType": "artifact_revision_event",
-          "cpsStage": "idea_generation",
+          "eventType": "idea_created",
+          "cpsStage": "solution_design",
           "activityMode": "divergence",
-          "timestamp": "2026-05-21T15:05:30.506Z",
+          "timestamp": "2026-06-04T13:38:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-9",
+            "text": "웹앱 형태로 만들고, 첫 화면에는 오늘 할 일과 이번 주 마감 과제만 보여준다."
           }
         },
         {
           "eventId": "evt-0008",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team B",
-          "actorId": "ai-01",
-          "actorName": "AI 팀원",
-          "actorRole": "ai_scaffold",
-          "eventType": "idea_created",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "convergence_note_created",
           "cpsStage": "idea_generation",
-          "activityMode": "divergence",
-          "timestamp": "2026-05-21T15:02:30.506Z",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-04T13:48:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-8",
+            "text": "최종 선택 아이디어는 통합 캘린더와 우선순위 보드를 결합한 과제 관리 대시보드이다."
           }
         },
         {
           "eventId": "evt-0007",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
+          "teamId": "1조",
           "actorId": "stu-03",
           "actorName": "박서연",
           "actorRole": "learner",
-          "eventType": "phase_switch",
+          "eventType": "idea_created",
           "cpsStage": "idea_generation",
-          "activityMode": "convergence",
-          "timestamp": "2026-05-21T14:59:30.506Z",
+          "activityMode": "divergence",
+          "timestamp": "2026-06-04T13:58:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-7",
+            "text": "팀플 역할과 개인 할 일을 함께 관리하는 공동 체크리스트"
           }
         },
         {
           "eventId": "evt-0006",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
+          "teamId": "1조",
           "actorId": "stu-02",
           "actorName": "이준호",
           "actorRole": "learner",
-          "eventType": "cps_stage_transition",
-          "cpsStage": "problem_exploration",
+          "eventType": "idea_created",
+          "cpsStage": "idea_generation",
           "activityMode": "divergence",
-          "timestamp": "2026-05-21T14:56:30.506Z",
+          "timestamp": "2026-06-04T14:08:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-6",
+            "text": "마감 임박 과제를 색상과 알림으로 알려주는 우선순위 보드"
           }
         },
         {
           "eventId": "evt-0005",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
+          "teamId": "1조",
           "actorId": "stu-01",
           "actorName": "김민서",
           "actorRole": "learner",
-          "eventType": "ai_interaction_event",
-          "cpsStage": "problem_exploration",
+          "eventType": "idea_created",
+          "cpsStage": "idea_generation",
           "activityMode": "divergence",
-          "timestamp": "2026-05-21T14:53:30.506Z",
+          "timestamp": "2026-06-04T14:18:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-5",
+            "text": "모든 과제 마감일을 자동으로 모아 보여주는 통합 캘린더"
           }
         },
         {
           "eventId": "evt-0004",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team B",
-          "actorId": "stu-04",
-          "actorName": "최도윤",
+          "teamId": "1조",
+          "actorId": "stu-03",
+          "actorName": "박서연",
           "actorRole": "learner",
-          "eventType": "artifact_revision_event",
+          "eventType": "convergence_note_created",
           "cpsStage": "problem_exploration",
           "activityMode": "convergence",
-          "timestamp": "2026-05-21T14:50:30.506Z",
+          "timestamp": "2026-06-04T14:28:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-4",
+            "text": "대학생은 과제 관리에 어려움을 겪는다.\n왜냐하면 여러 플랫폼에 일정과 제출물이 흩어져 있기 때문이다.\n\nHMW: 어떻게 하면 대학생이 여러 플랫폼을 오가지 않고 오늘 해야 할 과제를 바로 파악할 수 있을까?"
           }
         },
         {
           "eventId": "evt-0003",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
+          "teamId": "1조",
           "actorId": "stu-03",
           "actorName": "박서연",
           "actorRole": "learner",
           "eventType": "idea_created",
           "cpsStage": "problem_exploration",
           "activityMode": "divergence",
-          "timestamp": "2026-05-21T14:47:30.506Z",
+          "timestamp": "2026-06-04T14:38:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-3",
+            "text": "새로운 수업 플랫폼을 매번 확인해야 해서 피로감이 크다."
           }
         },
         {
           "eventId": "evt-0002",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
+          "teamId": "1조",
           "actorId": "stu-02",
           "actorName": "이준호",
           "actorRole": "learner",
-          "eventType": "phase_switch",
+          "eventType": "idea_created",
           "cpsStage": "problem_exploration",
           "activityMode": "divergence",
-          "timestamp": "2026-05-21T14:44:30.506Z",
+          "timestamp": "2026-06-04T14:48:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-2",
+            "text": "팀플 일정과 개인 과제 일정이 서로 겹칠 때 우선순위를 정하기 어렵다."
           }
         },
         {
           "eventId": "evt-0001",
-          "sessionId": "demo-session-2026-05-18",
+          "sessionId": "session-project-1",
           "projectId": "project-1",
-          "teamId": "Team A",
-          "actorId": "ai-01",
-          "actorName": "AI 팀원",
-          "actorRole": "ai_scaffold",
-          "eventType": "cps_stage_transition",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "idea_created",
           "cpsStage": "problem_exploration",
-          "activityMode": "convergence",
-          "timestamp": "2026-05-21T14:41:30.506Z",
+          "activityMode": "divergence",
+          "timestamp": "2026-06-04T14:58:03.499Z",
           "payload": {
-            "mock": true
+            "noteId": "note-1",
+            "text": "대학생은 과제 공지가 LMS, 메신저, 이메일에 흩어져 있어 마감일을 놓치기 쉽다."
           }
         }
       ],
       "revisions": [
         {
-          "version": "v0.3",
-          "by": "박서연",
-          "timestamp": "2026-05-21T14:33:30.506Z",
-          "delta": 27,
-          "title": "선택 기준 반영",
-          "note": "실행 가능성과 도움이 되는 정도를 기준으로 우선순위를 정했습니다.",
+          "version": "v0.4",
+          "by": "이준호",
+          "timestamp": "2026-06-04T15:06:03.499Z",
+          "delta": 23,
+          "title": "테스트 기준 정리",
+          "note": "1분 안에 가장 급한 과제를 찾는지 확인하는 기준을 추가했습니다.",
           "type": "edit"
         },
         {
-          "version": "AI",
-          "by": "AI",
-          "timestamp": "2026-05-21T14:23:30.506Z",
-          "delta": 9,
-          "title": "힌트 제공",
-          "note": "관점 확장 질문을 제공했습니다.",
-          "type": "ai"
+          "version": "v0.3",
+          "by": "박서연",
+          "timestamp": "2026-06-04T15:04:03.499Z",
+          "delta": 18,
+          "title": "프로토타입 형태 확정",
+          "note": "모바일 우선 웹 대시보드 형태로 산출물을 정리했습니다.",
+          "type": "edit"
         },
         {
           "version": "v0.2",
-          "by": "이준호",
-          "timestamp": "2026-05-21T14:13:30.506Z",
-          "delta": 34,
-          "title": "아이디어 묶기",
-          "note": "비슷한 아이디어를 세 가지 방향으로 묶었습니다.",
+          "by": "김민서",
+          "timestamp": "2026-06-04T15:01:03.499Z",
+          "delta": 15,
+          "title": "평가행렬 반영",
+          "note": "아이디어 3개를 비교하고 공동 체크리스트 결합안을 선택했습니다.",
+          "type": "edit"
+        },
+        {
+          "version": "v0.1",
+          "by": "김민서",
+          "timestamp": "2026-06-04T14:58:03.499Z",
+          "delta": 12,
+          "title": "문제 정의 초안",
+          "note": "문제 정의와 HMW 문장을 작성했습니다.",
           "type": "edit"
         }
       ],
       "aiFeed": [
         {
           "by": "AI",
-          "text": "문제를 더 넓게 보려면 공간 부족, 이동 동선, 안전, 소음 관점을 나누어 살펴보세요.",
-          "timestamp": "2026-05-21T14:23:30.506Z"
+          "text": "자동 요약: 입력된 내용은 정보 분산, 우선순위 혼란, 첫 사용 경험의 어려움과 연결됩니다.\n현재 근거: 대학생은 과제 공지가 LMS, 메신저, 이메일에 흩어져 있어 마감일을 놓치기 쉽다. / 팀플 일정과 개인 과제 일정이 서로 겹칠 때 우선순위를 정하기 어렵다. / 새로운 수업 플랫폼을 매번 확인해야 해서 피로감이 크다. / 대학생은 과제 관리에 어려움을 겪는다.\n왜냐하면 여러 플랫폼에 일정과 제출물이 흩어져 있기 때문이다.\n\nHMW: 어떻게 하면 대학생이 여러 플랫폼을 오가지 않고 오늘 해야 할 과제를 바로 파악할 수 있을까?\n반복 의견: 마감일 확인 부담, 여러 도구 확인 피로, 팀 과제와 개인 과제의 충돌이 자주 등장합니다.\n빠진 관점: 처음 사용하는 학생, 접근성, 알림 피로, 개인정보 동의 과정을 함께 점검해 보세요.\n추가 탐색 질문: 두 명 이상의 사용자에게 반복해서 나타나는 불편은 무엇인가요?",
+          "stage": "problem_exploration",
+          "requesterId": "stu-01",
+          "timestamp": "2026-06-04T15:13:46.967Z"
+        },
+        {
+          "by": "AI",
+          "text": "주요 문제 요약: 과제 정보가 여러 플랫폼에 분산되어 확인 부담이 큽니다.\n반복 의견: 마감일 누락, 우선순위 혼란, 플랫폼 피로감.\n추가 질문: 학생이 가장 자주 확인하는 채널은 무엇인가요?",
+          "stage": "problem_exploration",
+          "requesterId": "stu-01",
+          "timestamp": "2026-06-04T15:04:03.499Z"
+        },
+        {
+          "by": "AI",
+          "text": "자기점검 질문: 이 해결안은 실제 수업 환경에서 실행 가능한가요?\n가장 큰 위험 요소는 자동 수집 정확도입니다.\n성공 기준을 테스트 문장으로 바꿔보세요.",
+          "stage": "solution_design",
+          "requesterId": "stu-03",
+          "timestamp": "2026-06-04T15:05:03.499Z"
         }
-      ]
+      ],
+      "decisions": {
+        "idea_generation": {
+          "updatedBy": "김민서",
+          "timestamp": "2026-06-04T15:02:03.499Z",
+          "selectedNoteId": "note-7",
+          "matrix": [
+            {
+              "noteId": "note-5",
+              "scores": [
+                5,
+                4,
+                3,
+                4
+              ],
+              "total": 16
+            },
+            {
+              "noteId": "note-6",
+              "scores": [
+                4,
+                5,
+                3,
+                5
+              ],
+              "total": 17
+            },
+            {
+              "noteId": "note-7",
+              "scores": [
+                4,
+                4,
+                5,
+                5
+              ],
+              "total": 18
+            }
+          ]
+        }
+      }
     },
     "project-2": {
-      "notes": [
-        {
-          "id": "note-4",
-          "stage": "problem_exploration",
-          "mode": "divergence",
-          "author": "김민서",
-          "actorId": "stu-01",
-          "teamId": "Team A",
-          "text": "생각 카드 테스트",
-          "timestamp": "2026-05-21T15:55:34.846Z",
-          "replies": []
-        }
-      ],
-      "events": [
-        {
-          "eventId": "evt-0025",
-          "sessionId": "session-project-2",
-          "projectId": "project-2",
-          "teamId": "Team A",
-          "actorId": "stu-01",
-          "actorName": "김민서",
-          "actorRole": "learner",
-          "eventType": "idea_created",
-          "cpsStage": "problem_exploration",
-          "activityMode": "divergence",
-          "timestamp": "2026-05-21T15:55:34.846Z",
-          "payload": {
-            "noteId": "note-4",
-            "text": "생각 카드 테스트"
-          }
-        }
-      ],
+      "notes": [],
+      "events": [],
       "revisions": [],
-      "aiFeed": []
+      "aiFeed": [],
+      "decisions": {}
     },
     "project-3": {
       "notes": [],
       "events": [],
       "revisions": [],
-      "aiFeed": []
+      "aiFeed": [],
+      "decisions": {}
     }
   }
 }
