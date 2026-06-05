@@ -1,6 +1,6 @@
 {
   "meta": {
-    "eventSeq": 49,
+    "eventSeq": 83,
     "noteSeq": 15,
     "revisionSeq": 4
   },
@@ -11,7 +11,10 @@
       "topic": "여러 플랫폼에 흩어진 과제와 일정을 한곳에서 관리하는 서비스 설계",
       "teams": 4,
       "createdBy": "system",
-      "createdAt": "2026-06-04T15:08:03.499Z"
+      "createdAt": "2026-06-04T15:08:03.499Z",
+      "enrolledStudents": [],
+      "visibleToAll": true,
+      "shareCode": "55E1A3"
     },
     {
       "id": "project-2",
@@ -19,7 +22,9 @@
       "topic": "학생들이 쉬는 시간에 사용할 수 있는 공간을 쉽게 찾도록 돕는 서비스 설계",
       "teams": 4,
       "createdBy": "system",
-      "createdAt": "2026-06-04T15:08:03.499Z"
+      "createdAt": "2026-06-04T15:08:03.499Z",
+      "enrolledStudents": [],
+      "visibleToAll": true
     },
     {
       "id": "project-3",
@@ -27,7 +32,9 @@
       "topic": "지역 주민과 학생이 주변 상점을 더 쉽게 이용할 수 있는 안내 경험 설계",
       "teams": 4,
       "createdBy": "system",
-      "createdAt": "2026-06-04T15:08:03.499Z"
+      "createdAt": "2026-06-04T15:08:03.499Z",
+      "enrolledStudents": [],
+      "visibleToAll": true
     }
   ],
   "states": {
@@ -228,6 +235,584 @@
         }
       ],
       "events": [
+        {
+          "eventId": "evt-0083",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T06:05:58.749Z",
+          "payload": {
+            "from": "action_planning",
+            "to": "solution_design"
+          }
+        },
+        {
+          "eventId": "evt-0082",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "action_planning",
+          "activityMode": "divergence",
+          "timestamp": "2026-06-05T06:05:55.660Z",
+          "payload": {
+            "target": "divergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0081",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T06:05:54.237Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0080",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T06:05:53.020Z",
+          "payload": {
+            "from": "solution_design",
+            "to": "action_planning"
+          }
+        },
+        {
+          "eventId": "evt-0079",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T06:05:51.141Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0078",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T06:05:48.388Z",
+          "payload": {
+            "from": "idea_generation",
+            "to": "solution_design"
+          }
+        },
+        {
+          "eventId": "evt-0077",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T06:05:44.278Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0076",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T06:05:43.382Z",
+          "payload": {
+            "from": "problem_exploration",
+            "to": "idea_generation"
+          }
+        },
+        {
+          "eventId": "evt-0075",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "decision_matrix_used",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:58:50.358Z",
+          "payload": {
+            "selectedNoteId": "note-5",
+            "criteria": [
+              "사용 편의성",
+              "실현 가능성",
+              "영향력",
+              "확장성"
+            ],
+            "matrix": [
+              {
+                "noteId": "note-5",
+                "scores": [
+                  5,
+                  4,
+                  3,
+                  5
+                ],
+                "total": 17
+              }
+            ]
+          }
+        },
+        {
+          "eventId": "evt-0074",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "action_planning",
+          "activityMode": "divergence",
+          "timestamp": "2026-06-05T05:52:42.188Z",
+          "payload": {
+            "target": "divergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0073",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:52:41.196Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0072",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:52:38.715Z",
+          "payload": {
+            "from": "solution_design",
+            "to": "action_planning"
+          }
+        },
+        {
+          "eventId": "evt-0071",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:52:17.796Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0070",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:52:16.033Z",
+          "payload": {
+            "from": "idea_generation",
+            "to": "solution_design"
+          }
+        },
+        {
+          "eventId": "evt-0069",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:46:28.482Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0068",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:46:27.874Z",
+          "payload": {
+            "from": "problem_exploration",
+            "to": "idea_generation"
+          }
+        },
+        {
+          "eventId": "evt-0067",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "problem_exploration",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:46:27.132Z",
+          "payload": {
+            "from": "idea_generation",
+            "to": "problem_exploration"
+          }
+        },
+        {
+          "eventId": "evt-0066",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:46:26.284Z",
+          "payload": {
+            "from": "solution_design",
+            "to": "idea_generation"
+          }
+        },
+        {
+          "eventId": "evt-0065",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:46:25.573Z",
+          "payload": {
+            "from": "action_planning",
+            "to": "solution_design"
+          }
+        },
+        {
+          "eventId": "evt-0064",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:46:14.707Z",
+          "payload": {
+            "from": "solution_design",
+            "to": "action_planning"
+          }
+        },
+        {
+          "eventId": "evt-0063",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:46:13.699Z",
+          "payload": {
+            "from": "idea_generation",
+            "to": "solution_design"
+          }
+        },
+        {
+          "eventId": "evt-0062",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:46:09.988Z",
+          "payload": {
+            "from": "problem_exploration",
+            "to": "idea_generation"
+          }
+        },
+        {
+          "eventId": "evt-0061",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:44:27.916Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0060",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "action_planning",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:44:24.580Z",
+          "payload": {
+            "from": "solution_design",
+            "to": "action_planning"
+          }
+        },
+        {
+          "eventId": "evt-0059",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:44:21.011Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0058",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "solution_design",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:44:19.401Z",
+          "payload": {
+            "from": "idea_generation",
+            "to": "solution_design"
+          }
+        },
+        {
+          "eventId": "evt-0057",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "input_event",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:44:11.708Z",
+          "payload": {
+            "id": "field"
+          }
+        },
+        {
+          "eventId": "evt-0056",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "input_event",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:44:07.546Z",
+          "payload": {
+            "id": "field"
+          }
+        },
+        {
+          "eventId": "evt-0055",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "input_event",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:44:00.310Z",
+          "payload": {
+            "id": "field"
+          }
+        },
+        {
+          "eventId": "evt-0054",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "input_event",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:43:57.886Z",
+          "payload": {
+            "id": "field"
+          }
+        },
+        {
+          "eventId": "evt-0053",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "input_event",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:43:40.225Z",
+          "payload": {
+            "id": "field"
+          }
+        },
+        {
+          "eventId": "evt-0052",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:43:35.355Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
+        {
+          "eventId": "evt-0051",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "stage_moved",
+          "cpsStage": "idea_generation",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:43:32.827Z",
+          "payload": {
+            "from": "problem_exploration",
+            "to": "idea_generation"
+          }
+        },
+        {
+          "eventId": "evt-0050",
+          "sessionId": "session-project-1",
+          "projectId": "project-1",
+          "teamId": "1조",
+          "actorId": "stu-01",
+          "actorName": "김민서",
+          "actorRole": "learner",
+          "eventType": "button_clicked",
+          "cpsStage": "problem_exploration",
+          "activityMode": "convergence",
+          "timestamp": "2026-06-05T05:43:28.188Z",
+          "payload": {
+            "target": "convergence_tab"
+          }
+        },
         {
           "eventId": "evt-0049",
           "sessionId": "session-project-1",
@@ -1143,9 +1728,12 @@
       ],
       "decisions": {
         "idea_generation": {
-          "updatedBy": "김민서",
-          "timestamp": "2026-06-04T15:02:03.499Z",
-          "selectedNoteId": "note-7",
+          "criteria": [
+            "사용 편의성",
+            "실현 가능성",
+            "영향력",
+            "확장성"
+          ],
           "matrix": [
             {
               "noteId": "note-5",
@@ -1153,31 +1741,14 @@
                 5,
                 4,
                 3,
-                4
-              ],
-              "total": 16
-            },
-            {
-              "noteId": "note-6",
-              "scores": [
-                4,
-                5,
-                3,
                 5
               ],
               "total": 17
-            },
-            {
-              "noteId": "note-7",
-              "scores": [
-                4,
-                4,
-                5,
-                5
-              ],
-              "total": 18
             }
-          ]
+          ],
+          "selectedNoteId": "note-5",
+          "updatedBy": "김민서",
+          "timestamp": "2026-06-05T05:58:50.358Z"
         }
       }
     },

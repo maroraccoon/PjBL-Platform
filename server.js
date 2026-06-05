@@ -18,7 +18,19 @@ const demoUsers = [
   { id: 'stu-05', username: 'harin', password: 'student123', role: 'student', name: '정하린', team: '2조' },
   { id: 'stu-06', username: 'jihu', password: 'student123', role: 'student', name: '오지후', team: '3조' },
   { id: 'stu-07', username: 'yujin', password: 'student123', role: 'student', name: '한유진', team: '3조' },
-  { id: 'stu-08', username: 'jia', password: 'student123', role: 'student', name: '송지아', team: '4조' }
+  { id: 'stu-08', username: 'jia', password: 'student123', role: 'student', name: '송지아', team: '4조' },
+  { id: 'stu-09', username: 'chanhee', password: 'student123', role: 'student', name: '김찬희', team: '1조' },
+  { id: 'stu-10', username: 'ryeowon', password: 'student123', role: 'student', name: '김려원', team: '1조' },
+  { id: 'stu-11', username: 'gyeonguk', password: 'student123', role: 'student', name: '정경욱', team: '2조' },
+  { id: 'stu-12', username: 'sumin', password: 'student123', role: 'student', name: '이수민', team: '2조' },
+  { id: 'stu-13', username: 'yejin', password: 'student123', role: 'student', name: '최예진', team: '3조' },
+  { id: 'stu-14', username: 'taeho', password: 'student123', role: 'student', name: '강태호', team: '3조' },
+  { id: 'stu-15', username: 'narin', password: 'student123', role: 'student', name: '윤나린', team: '4조' },
+  { id: 'stu-16', username: 'hyunwoo', password: 'student123', role: 'student', name: '박현우', team: '4조' },
+  { id: 'stu-17', username: 'eunseo', password: 'student123', role: 'student', name: '오은서', team: '5조' },
+  { id: 'stu-18', username: 'minjae', password: 'student123', role: 'student', name: '서민재', team: '5조' },
+  { id: 'stu-19', username: 'seojin', password: 'student123', role: 'student', name: '한서진', team: '5조' },
+  { id: 'stu-20', username: 'yuna', password: 'student123', role: 'student', name: '장유나', team: '5조' }
 ];
 
 const sessions = new Map();
@@ -47,6 +59,9 @@ function normalizeStore(next) {
   next.projects ||= [];
   next.states ||= {};
   next.projects.forEach((project) => {
+    project.enrolledStudents ||= [];
+    if (typeof project.visibleToAll !== 'boolean') project.visibleToAll = project.createdBy !== 'teacher';
+    if (!project.shareCode && project.createdBy === 'teacher') project.shareCode = null;
     next.states[project.id] ||= emptyProjectState();
     const state = next.states[project.id];
     state.notes ||= [];
@@ -70,9 +85,9 @@ function saveStore(nextStore = store) {
 function createDefaultStore() {
   const now = Date.now();
   const projects = [
-    { id: 'project-1', name: '대학생 과제 관리 서비스', topic: '여러 플랫폼에 흩어진 과제와 일정을 한곳에서 관리하는 서비스 설계', teams: 4, createdBy: 'system', createdAt: new Date(now).toISOString() },
-    { id: 'project-2', name: '학교 휴게 공간 혼잡도 안내 서비스', topic: '학생들이 쉬는 시간에 사용할 수 있는 공간을 쉽게 찾도록 돕는 서비스 설계', teams: 4, createdBy: 'system', createdAt: new Date(now).toISOString() },
-    { id: 'project-3', name: '지역 상권 접근성 개선 프로젝트', topic: '지역 주민과 학생이 주변 상점을 더 쉽게 이용할 수 있는 안내 경험 설계', teams: 4, createdBy: 'system', createdAt: new Date(now).toISOString() }
+    { id: 'project-1', name: '대학생 과제 관리 서비스', topic: '여러 플랫폼에 흩어진 과제와 일정을 한곳에서 관리하는 서비스 설계', teams: 5, createdBy: 'system', createdAt: new Date(now).toISOString(), visibleToAll: true, enrolledStudents: [], shareCode: 'DEMO01' },
+    { id: 'project-2', name: '학교 휴게 공간 혼잡도 안내 서비스', topic: '학생들이 쉬는 시간에 사용할 수 있는 공간을 쉽게 찾도록 돕는 서비스 설계', teams: 5, createdBy: 'system', createdAt: new Date(now).toISOString(), visibleToAll: true, enrolledStudents: [], shareCode: 'DEMO02' },
+    { id: 'project-3', name: '지역 상권 접근성 개선 프로젝트', topic: '지역 주민과 학생이 주변 상점을 더 쉽게 이용할 수 있는 안내 경험 설계', teams: 5, createdBy: 'system', createdAt: new Date(now).toISOString(), visibleToAll: true, enrolledStudents: [], shareCode: 'DEMO03' }
   ];
   const state = emptyProjectState();
   const seedNotes = [
@@ -103,6 +118,7 @@ function createDefaultStore() {
     updatedBy: '김민서',
     timestamp: new Date(now - 360000).toISOString(),
     selectedNoteId: 'note-7',
+    criteria: ['실현 가능성', '영향력', '차별성', '명확성'],
     matrix: [
       { noteId: 'note-5', scores: [5, 4, 3, 4], total: 16 },
       { noteId: 'note-6', scores: [4, 5, 3, 5], total: 17 },
@@ -212,6 +228,25 @@ function publicUser(user) {
   return rest;
 }
 
+function visibleProjectsFor(user) {
+  if (user.role === 'teacher') return store.projects;
+  return store.projects.filter((project) =>
+    project.visibleToAll || (project.enrolledStudents || []).includes(user.id)
+  );
+}
+
+function canViewProject(project, user) {
+  return user.role === 'teacher' || project.visibleToAll || (project.enrolledStudents || []).includes(user.id);
+}
+
+function generateShareCode() {
+  let code = '';
+  do {
+    code = crypto.randomBytes(3).toString('hex').toUpperCase();
+  } while (store.projects.some((project) => project.shareCode === code));
+  return code;
+}
+
 function projectState(projectId) {
   store.states[projectId] ||= emptyProjectState();
   return store.states[projectId];
@@ -242,7 +277,10 @@ function addEvent(projectId, user, eventType, cpsStage, activityMode, payload = 
 function buildState(projectId, viewer) {
   const project = store.projects.find((item) => item.id === projectId);
   const state = projectState(projectId);
-  const students = demoUsers.filter((user) => user.role === 'student');
+  const enrolled = project.visibleToAll
+    ? demoUsers.filter((user) => user.role === 'student').map((user) => user.id)
+    : (project.enrolledStudents || []);
+  const students = demoUsers.filter((user) => user.role === 'student' && enrolled.includes(user.id));
   const now = Date.now();
   const roster = students.map((student) => {
     const session = [...sessions.values()].find((item) => item.user.id === student.id && item.projectId === projectId);
@@ -397,7 +435,19 @@ async function handleApi(req, res, url) {
     }
 
     if (req.method === 'GET' && url.pathname === '/api/projects') {
-      return sendJson(res, 200, { projects: store.projects });
+      return sendJson(res, 200, { projects: visibleProjectsFor(session.user) });
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/projects/join') {
+      if (session.user.role !== 'student') return sendJson(res, 403, { error: '학습자만 프로젝트 코드로 참여할 수 있습니다.' });
+      const body = await readBody(req);
+      const code = String(body.code || '').trim().toUpperCase();
+      const project = store.projects.find((item) => item.shareCode === code);
+      if (!project) return sendJson(res, 404, { error: '일치하는 프로젝트 코드가 없습니다.' });
+      project.enrolledStudents ||= [];
+      if (!project.enrolledStudents.includes(session.user.id)) project.enrolledStudents.push(session.user.id);
+      saveStore();
+      return sendJson(res, 200, { project });
     }
 
     if (req.method === 'POST' && url.pathname === '/api/projects') {
@@ -409,12 +459,25 @@ async function handleApi(req, res, url) {
         topic: String(body.topic || 'PjBL 연구 주제').trim(),
         teams: 4,
         createdBy: 'teacher',
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        visibleToAll: false,
+        enrolledStudents: [],
+        shareCode: null
       };
       store.projects.unshift(project);
       store.states[project.id] = emptyProjectState();
       saveStore();
       return sendJson(res, 201, { project });
+    }
+
+    const shareRoute = url.pathname.match(/^\/api\/projects\/([^/]+)\/share-code$/);
+    if (req.method === 'POST' && shareRoute) {
+      if (session.user.role !== 'teacher') return sendJson(res, 403, { error: '교수자만 프로젝트 코드를 발급할 수 있습니다.' });
+      const project = store.projects.find((item) => item.id === shareRoute[1]);
+      if (!project) return sendJson(res, 404, { error: '프로젝트를 찾을 수 없습니다.' });
+      project.shareCode = generateShareCode();
+      saveStore();
+      return sendJson(res, 200, { project });
     }
 
     const noteRoute = url.pathname.match(/^\/api\/projects\/([^/]+)\/notes\/([^/]+)(?:\/(replies|like|select))?$/);
@@ -425,6 +488,7 @@ async function handleApi(req, res, url) {
     const [, projectId, action] = route;
     const project = store.projects.find((item) => item.id === projectId);
     if (!project) return sendJson(res, 404, { error: '프로젝트를 찾을 수 없습니다.' });
+    if (!canViewProject(project, session.user)) return sendJson(res, 403, { error: '프로젝트 코드 입력 후 참여할 수 있습니다.' });
     session.projectId = projectId;
 
     if (req.method === 'GET' && action === 'state') return sendJson(res, 200, buildState(projectId, session.user));
@@ -516,12 +580,13 @@ async function handleDecision(req, res, session, projectId) {
   const body = await readBody(req);
   const state = projectState(projectId);
   state.decisions[body.stage || 'idea_generation'] = {
+    criteria: body.criteria || [],
     matrix: body.matrix || [],
     selectedNoteId: body.selectedNoteId || null,
     updatedBy: session.user.name,
     timestamp: new Date().toISOString()
   };
-  addEvent(projectId, session.user, 'decision_matrix_used', body.stage || 'idea_generation', 'convergence', { selectedNoteId: body.selectedNoteId, matrix: body.matrix || [] });
+  addEvent(projectId, session.user, 'decision_matrix_used', body.stage || 'idea_generation', 'convergence', { selectedNoteId: body.selectedNoteId, criteria: body.criteria || [], matrix: body.matrix || [] });
   saveStore();
   broadcast(projectId);
   return sendJson(res, 200, { state: buildState(projectId, session.user) });

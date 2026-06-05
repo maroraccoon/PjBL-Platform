@@ -86,7 +86,7 @@
           </div>
           <p class="mt-6 text-xs font-bold uppercase tracking-[.18em] text-muted">연구용 CPS 플랫폼</p>
           <h1 class="mt-3 text-4xl font-semibold tracking-tight md:text-6xl">AI 활용 PjBL 플랫폼 V2</h1>
-          <p class="mt-4 text-sm leading-6 text-muted">SSE 기반 부드러운 실시간 협업, 행동 로그 수집, AI 스캐폴딩 연구 시연용 MVP입니다.</p>
+          <p class="mt-4 text-sm leading-6 text-muted">SSE 기반 부드러운 실시간 협업, 행동 로그 수집, AI 도움 연구 시연용 MVP입니다.</p>
         </div>
         <div class="mt-10 grid gap-5 md:grid-cols-2">
           <button data-role-select="student" class="group rounded-[28px] panel p-7 text-left transition hover:-translate-y-1">
@@ -130,7 +130,7 @@
         <div class="mt-5 rounded-2xl bg-paper p-4 text-xs leading-6 text-muted">
           <strong class="text-ink">데모 계정</strong><br>
           교수자: teacher / teacher123<br>
-          학생: minseo, junho, seoyeon, doyoon / student123
+          학생: minseo, junho, seoyeon, doyoon 등 20명 / student123
         </div>
       </div>
     </div>
@@ -158,6 +158,13 @@
           <button id="saveProjectBtn" class="rounded-2xl bg-teal px-4 py-3 text-sm font-bold text-white">생성</button>
         </div>
       </div>
+      <div id="joinProjectPanel" class="mt-5 hidden rounded-[24px] panel p-5">
+        <div class="grid gap-3 md:grid-cols-[1fr_auto]">
+          <input id="joinProjectCode" class="rounded-2xl border border-line bg-white px-4 py-3 text-sm outline-none" placeholder="교수자가 공유한 프로젝트 코드를 입력하세요" />
+          <button id="joinProjectBtn" class="rounded-2xl bg-teal px-4 py-3 text-sm font-bold text-white">프로젝트 추가</button>
+        </div>
+        <p id="joinProjectMessage" class="mt-3 hidden text-sm font-bold"></p>
+      </div>
       <div id="projectList" class="mt-8 grid gap-4 md:grid-cols-3"></div>
     </div>
   </section>
@@ -168,6 +175,9 @@
         <header class="glass rounded-[28px] px-5 py-4">
           <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div>
+              <button id="backToProjects" class="mb-3 inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-bold shadow-insetLine">
+                <i data-lucide="arrow-left" class="h-4 w-4"></i>프로젝트 선택으로
+              </button>
               <div id="headerBadges" class="flex flex-wrap items-center gap-2 text-xs font-bold text-muted"></div>
               <h1 id="appTitle" class="mt-2 text-3xl font-semibold tracking-tight md:text-4xl">AI 활용 PjBL 플랫폼</h1>
               <p id="appSubtitle" class="mt-2 max-w-4xl text-sm leading-6 text-muted"></p>
@@ -193,12 +203,15 @@
 
           <div id="workspaceGrid" class="grid min-h-[780px] transition-all duration-300" style="grid-template-columns:260px minmax(0,1fr) 360px;">
             <aside id="leftStagePanel" class="border-r border-line/70 bg-white/54 p-4">
-              <p class="text-xs font-bold uppercase tracking-[.18em] text-muted">연구 로그</p>
-              <h3 class="mt-2 text-xl font-semibold">팀 활동 인식</h3>
+              <h3 class="text-xl font-semibold">우리 팀 협동 온도</h3>
               <div id="studentAwarenessList" class="mt-4 space-y-2"></div>
               <div class="mt-4 rounded-2xl bg-paper p-3">
                 <div class="mb-2 flex justify-between text-xs text-muted"><span>우리 팀 협동 온도</span><strong id="studentBalanceRatio" class="text-ink">32°C</strong></div>
                 <div id="studentBalanceBar" class="flex h-2 overflow-hidden rounded-full bg-slate-200"></div>
+              </div>
+              <div class="mt-5">
+                <h3 class="text-sm font-semibold">산출물 진화 타임라인</h3>
+                <div id="artifactTimeline" class="mt-3 grid gap-3"></div>
               </div>
               <button id="reviseArtifact" class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-line bg-white px-3 py-2 text-sm font-bold">
                 <i data-lucide="git-commit-horizontal" class="h-4 w-4"></i>버전 생성
@@ -216,7 +229,7 @@
               <div id="canvasArea" class="board-grid relative flex-1 overflow-auto p-5">
                 <div id="divergencePanel" class="phase-panel">
                   <div id="promptCards" class="mb-4"></div>
-                  <div id="convergenceInputRow" class="mb-4 grid gap-3 md:grid-cols-[1fr_auto]">
+                  <div id="divergenceInputRow" class="mb-4 grid gap-3 md:grid-cols-[1fr_auto]">
                     <textarea id="divergenceInput" class="min-h-24 resize-none rounded-[22px] border border-yellow-200 bg-white/92 p-4 text-sm outline-none" placeholder="생각, 관찰, 질문, 아이디어를 카드로 추가하세요."></textarea>
                     <button id="addDivergence" class="inline-flex items-center justify-center gap-2 rounded-[22px] bg-yellow-300 px-5 py-3 text-sm font-bold text-ink">
                       <i data-lucide="plus" class="h-4 w-4"></i>카드 생성
@@ -225,27 +238,20 @@
                   <div id="divergenceCards" class="grid gap-4 md:grid-cols-2 2xl:grid-cols-3"></div>
                 </div>
                 <div id="convergencePanel" class="phase-panel hidden">
-                  <div class="mb-4 grid gap-3 md:grid-cols-[1fr_auto]">
-                    <textarea id="convergenceInput" class="min-h-24 resize-none rounded-[22px] border border-teal/20 bg-white/92 p-4 text-sm outline-none" placeholder="팀이 선택한 내용, 이유, 다음 할 일을 정리하세요."></textarea>
+                  <div id="convergenceInputRow" class="mb-4 grid gap-3 md:grid-cols-[1fr_auto]">
+                    <textarea id="convergenceInput" class="min-h-24 resize-none rounded-[22px] border border-teal/20 bg-white/92 p-4 text-sm outline-none" placeholder="수렴 내용을 입력하세요."></textarea>
                     <button id="addConvergence" class="inline-flex items-center justify-center gap-2 rounded-[22px] bg-teal px-5 py-3 text-sm font-bold text-white">
                       <i data-lucide="check" class="h-4 w-4"></i>정리 저장
                     </button>
                   </div>
                   <div id="convergenceCards" class="grid gap-4"></div>
                 </div>
-                <button id="expandCanvasBtn" class="absolute bottom-5 left-5 z-20 inline-flex items-center gap-2 rounded-2xl bg-ink px-4 py-3 text-sm font-bold text-white shadow-soft">
-                  <i data-lucide="expand" class="h-4 w-4"></i><span id="expandCanvasLabel">확장</span>
-                </button>
-              </div>
-              <div id="artifactFooter" class="border-t border-line/70 bg-white/78 p-4">
-                <div class="mb-3 flex items-center justify-between"><h3 class="text-sm font-semibold">산출물 진화 타임라인</h3><span class="text-xs text-muted">실제 artifact_revision_event 연동</span></div>
-                <div id="artifactTimeline" class="timeline-line relative grid grid-cols-4 gap-3"></div>
               </div>
             </section>
 
             <aside id="rightSupportPanel" class="flex min-h-0 flex-col border-l border-line/70 bg-white/72 p-4">
               <div class="flex items-center justify-between">
-                <div><p class="text-xs font-bold uppercase tracking-[.16em] text-muted">AI 도움</p><h2 class="mt-1 text-xl font-semibold">스캐폴딩</h2></div>
+                <div><h2 class="text-xl font-bold">AI 도움</h2></div>
                 <span id="aiLockBadge" class="rounded-full bg-violet/10 px-3 py-1 text-xs font-bold text-violet">활성화</span>
               </div>
               <div id="aiGate" class="mt-4 rounded-2xl border border-dashed border-violet/30 bg-purple-50 p-4 text-sm leading-6 text-violet"></div>
@@ -286,8 +292,20 @@
         </section>
 
         <section id="studentRoster" data-view="teacher" class="panel rounded-[30px] p-5">
-          <div class="flex items-center justify-between"><div><p class="text-xs font-bold uppercase tracking-[.16em] text-muted">활동 뱃지</p><h2 class="mt-1 text-xl font-semibold">개인 활동 유형 뱃지</h2></div><span id="studentRosterCount" class="rounded-full bg-white px-3 py-1 text-xs font-bold text-muted shadow-insetLine">0명</span></div>
-          <div id="studentRosterList" class="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4"></div>
+          <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div><p class="text-xs font-bold uppercase tracking-[.16em] text-muted">학습자 명단</p><h2 class="mt-1 text-xl font-semibold">학습자 활동 리스트</h2></div>
+            <div class="flex items-center gap-2">
+              <select id="rosterSort" class="rounded-xl border border-line bg-white px-3 py-2 text-sm font-bold">
+                <option value="name">이름순</option>
+                <option value="team">팀순</option>
+                <option value="event">이벤트 많은순</option>
+                <option value="rate">분당 이벤트순</option>
+                <option value="online">접속중 우선</option>
+              </select>
+              <span id="studentRosterCount" class="rounded-full bg-white px-3 py-1 text-xs font-bold text-muted shadow-insetLine">0명</span>
+            </div>
+          </div>
+          <div id="studentRosterList" class="scrollbar-thin mt-5 max-h-[420px] overflow-auto rounded-2xl border border-line bg-white"></div>
         </section>
 
         <section id="eventlog" data-view="teacher" class="panel rounded-[30px] p-5">

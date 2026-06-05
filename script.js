@@ -20,7 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
     stream: null,
     heartbeat: null,
     inputLogTimer: null,
-    charts: {}
+    charts: {},
+    rosterSort: 'name',
+    teacherDetailStage: null
   };
 
   const $ = (id) => document.getElementById(id);
@@ -107,20 +109,23 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderProjectScreen() {
     $('projectRoleLabel').textContent = state.user.role === 'teacher' ? '교수자 공간' : '학생 공간';
     $('projectTitle').textContent = state.user.role === 'teacher' ? '관리할 프로젝트를 선택하세요' : '참여할 프로젝트를 선택하세요';
-    $('projectHelp').textContent = 'SSE 기반 부드러운 실시간 방식으로 학생 화면과 교수자 화면이 같은 이벤트 로그를 공유합니다.';
+    $('projectHelp').textContent = 'SSE 기반 부드러운 실시간 방식으로 같은 프로젝트 이벤트 로그를 공유합니다.';
     $('createProjectBtn').classList.toggle('hidden', state.user.role !== 'teacher');
+    $('joinProjectPanel').classList.toggle('hidden', state.user.role !== 'student');
     $('projectList').innerHTML = state.projects.map((project) => `
-      <button class="project-card rounded-[22px] border border-white/80 bg-white/82 p-5 text-left shadow-soft transition hover:-translate-y-1" data-project="${project.id}">
+      <article class="project-card cursor-pointer rounded-[22px] border border-white/80 bg-white/82 p-5 text-left shadow-soft transition hover:-translate-y-1" data-project="${project.id}" role="button" tabindex="0">
         <div class="flex items-center justify-between">
           <span class="rounded-full bg-yellow-200 px-3 py-1 text-xs font-bold text-ink">${project.teams || 4}개 팀</span>
           <i data-lucide="arrow-up-right" class="h-5 w-5 text-muted"></i>
         </div>
         <h2 class="mt-5 text-xl font-semibold">${escapeHtml(project.name)}</h2>
         <p class="mt-2 text-sm leading-6 text-muted">${escapeHtml(project.topic)}</p>
-      </button>
+        ${state.user.role === 'teacher' ? `<div class="mt-4 rounded-2xl bg-paper p-3 text-xs font-bold text-muted">공유 코드: <span class="text-ink">${escapeHtml(project.shareCode || '미발급')}</span></div><span class="share-code-btn mt-3 inline-flex rounded-xl bg-ink px-3 py-2 text-xs font-bold text-white" data-share-project="${project.id}">프로젝트 코드 공유하기</span>` : ''}
+      </article>
     `).join('');
     document.querySelectorAll('.project-card').forEach((card) => {
-      card.addEventListener('click', async () => {
+      card.addEventListener('click', async (event) => {
+        if (event.target.closest('[data-share-project]')) return;
         state.currentProject = state.projects.find((project) => project.id === card.dataset.project);
         await enterApp();
       });
@@ -176,13 +181,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function applyRoleView() {
     const isStudent = state.user.role === 'student';
-    $('appTitle').textContent = isStudent ? state.currentProject.name : '교수자 조율 대시보드';
-    $('appSubtitle').textContent = isStudent
-      ? '상단 CPS 흐름에 따라 발산과 수렴을 반복하며 팀 산출물을 발전시킵니다.'
-      : '팀별 실제 작업 상태, AI 사용 편향, 단계별 로그를 관찰합니다.';
+    $('appTitle').textContent = state.currentProject.name;
+    $('appSubtitle').textContent = '';
     $('headerBadges').innerHTML = isStudent
       ? `<span class="rounded-full bg-white px-3 py-1 shadow-insetLine">${state.user.name}</span><span class="rounded-full bg-white px-3 py-1 shadow-insetLine">${state.user.team}</span>`
-      : '<span class="rounded-full bg-white px-3 py-1 shadow-insetLine">교수자 화면</span><span class="rounded-full bg-white px-3 py-1 shadow-insetLine">실시간 관찰</span>';
+      : `<span class="rounded-full bg-white px-3 py-1 shadow-insetLine">프로젝트 관리</span><span class="rounded-full bg-white px-3 py-1 shadow-insetLine">${state.currentProject.shareCode ? `공유 코드 ${escapeHtml(state.currentProject.shareCode)}` : '공유 코드 미발급'}</span>`;
     $('teacherMetrics').classList.toggle('role-hidden', isStudent);
     document.querySelectorAll('[data-view]').forEach((section) => section.classList.toggle('role-hidden', section.dataset.view !== state.user.role));
   }
@@ -209,7 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
     $('leftStagePanel').classList.toggle('hidden', state.canvasExpanded);
     $('rightSupportPanel').classList.toggle('hidden', state.canvasExpanded);
     $('workspaceTopBar').classList.toggle('hidden', state.canvasExpanded);
-    $('artifactFooter').classList.toggle('hidden', state.canvasExpanded);
     $('workspace').classList.toggle('fixed', state.canvasExpanded);
     $('workspace').classList.toggle('inset-0', state.canvasExpanded);
     $('workspace').classList.toggle('z-50', state.canvasExpanded);
@@ -220,7 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
     $('canvasArea').classList.toggle('p-8', state.canvasExpanded);
     $('canvasArea').style.height = state.canvasExpanded ? '100vh' : '';
     $('canvasArea').style.width = state.canvasExpanded ? '100vw' : '';
-    $('expandCanvasLabel').textContent = state.canvasExpanded ? '축소' : '확장';
   }
 
   function renderStepBar() {
@@ -262,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
       : '';
     $('divergencePanel').classList.toggle('hidden', state.activePhase !== 'divergence');
     $('convergencePanel').classList.toggle('hidden', state.activePhase !== 'convergence');
-    $('convergenceInputRow')?.classList.toggle('hidden', stage === 'problem_exploration' && state.activePhase === 'convergence');
+    $('convergenceInputRow')?.classList.toggle('hidden', ['problem_exploration', 'idea_generation'].includes(stage) && state.activePhase === 'convergence');
     $('divergenceCards').innerHTML = divNotes.map(renderNoteCard).join('') || emptyCard('아직 발산 카드가 없습니다.');
     $('convergenceCards').innerHTML = convergenceContent(stage, convNotes, divNotes);
   }
@@ -401,6 +402,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function decisionMatrixPanel(divNotes) {
     const rows = divNotes;
     if (!rows.length) return emptyCard('먼저 발산 공간에서 아이디어 카드를 작성하세요.');
+    const saved = state.projectState.decisions?.idea_generation || {};
+    const criteria = saved.criteria?.length ? saved.criteria : ['실현 가능성', '영향력', '차별성', '명확성'];
     return `
       <div class="rounded-[22px] bg-white/90 p-5 shadow-insetLine">
         <div class="flex flex-wrap items-center justify-between gap-3">
@@ -423,10 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <th rowspan="2" class="w-20 border border-white px-3 py-3">총계</th>
               </tr>
               <tr class="bg-sky-100 text-center">
-                <th class="border border-white px-3 py-2"><input class="criteria-input w-full rounded bg-white/80 px-2 py-1 text-center" value="A" title="평가 준거 A" /></th>
-                <th class="border border-white px-3 py-2"><input class="criteria-input w-full rounded bg-white/80 px-2 py-1 text-center" value="B" title="평가 준거 B" /></th>
-                <th class="border border-white px-3 py-2"><input class="criteria-input w-full rounded bg-white/80 px-2 py-1 text-center" value="C" title="평가 준거 C" /></th>
-                <th class="border border-white px-3 py-2"><input class="criteria-input w-full rounded bg-white/80 px-2 py-1 text-center" value="D" title="평가 준거 D" /></th>
+                ${criteria.map((name, index) => `<th class="border border-white px-3 py-2"><input class="criteria-input w-full rounded bg-white/90 px-2 py-1 text-center font-bold" value="${escapeHtml(name)}" data-criteria-index="${index}" title="평가 준거 ${index + 1}" /></th>`).join('')}
               </tr>
             </thead>
             <tbody>${rows.map((note, rowIndex) => matrixRow(note, rowIndex)).join('')}</tbody>
@@ -437,11 +437,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function matrixRow(note, rowIndex) {
+    const saved = state.projectState.decisions?.idea_generation?.matrix?.find((row) => row.noteId === note.id);
+    const scores = saved?.scores || [];
     return `<tr class="bg-slate-50 text-center" data-matrix-note="${note.id}">
       <td class="border border-white bg-sky-50 px-2 py-3 font-semibold">${rowIndex + 1}</td>
       <td class="border border-white bg-sky-50 px-3 py-3 text-left font-semibold">${escapeHtml(note.text)}</td>
-      ${['A', 'B', 'C', 'D'].map((key) => `<td class="border border-white bg-slate-100 px-2 py-2"><input class="matrix-score w-16 rounded-lg border border-line bg-white px-2 py-1 text-center" data-score="${key}" type="number" min="1" max="5" value="" /></td>`).join('')}
-      <td class="matrix-total border border-white bg-sky-50 px-3 py-3 font-bold">0</td>
+      ${['A', 'B', 'C', 'D'].map((key, index) => `<td class="border border-white bg-slate-100 px-2 py-2"><input class="matrix-score w-16 rounded-lg border border-line bg-white px-2 py-1 text-center" data-score="${key}" type="number" min="0" max="5" step="1" value="${scores[index] || ''}" placeholder="0~5" /></td>`).join('')}
+      <td class="matrix-total border border-white bg-sky-50 px-3 py-3 font-bold">${scores.reduce((sum, value) => sum + Number(value || 0), 0)}</td>
     </tr>`;
   }
 
@@ -474,11 +476,11 @@ document.addEventListener('DOMContentLoaded', () => {
         ? { bg: 'bg-yellow-50', border: 'border-yellow-300' }
         : { bg: 'bg-amber-50', border: 'border-amber-300' },
       solution_design: note.mode === 'divergence'
-        ? { bg: 'bg-emerald-50', border: 'border-emerald-300' }
-        : { bg: 'bg-teal-50', border: 'border-teal-300' },
+        ? { bg: 'bg-emerald-100', border: 'border-emerald-400' }
+        : { bg: 'bg-teal-200', border: 'border-teal-500' },
       action_planning: note.mode === 'divergence'
-        ? { bg: 'bg-violet-50', border: 'border-violet-300' }
-        : { bg: 'bg-purple-50', border: 'border-purple-300' }
+        ? { bg: 'bg-violet-200', border: 'border-violet-500' }
+        : { bg: 'bg-purple-100', border: 'border-purple-400' }
     };
     return map[note.stage] || { bg: 'bg-white', border: 'border-line' };
   }
@@ -489,11 +491,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const used = Math.min(5, usage[stage.id] || 0);
       return `<div class="rounded-2xl bg-paper p-3">
         <div class="flex justify-between text-xs font-bold"><span>${stage.label}</span><span>${used}/5</span></div>
-        <div class="mt-2 flex gap-1">${Array.from({ length: 5 }, (_, i) => `<span class="h-2 flex-1 rounded-full ${i < used ? 'bg-violet' : 'bg-slate-200'}"></span>`).join('')}</div>
+        <div class="mt-2 flex gap-1">${Array.from({ length: 5 }, (_, i) => `<span class="h-2 flex-1 rounded-full ${i < used ? (used >= 5 ? 'bg-rose' : 'bg-violet') : 'bg-slate-200'}"></span>`).join('')}</div>
       </div>`;
     }).join('');
     $('aiLockBadge').innerHTML = '<span class="inline-flex items-center gap-1"><i data-lucide="sparkles" class="h-3.5 w-3.5"></i>활성화</span>';
-    $('aiGate').textContent = 'AI 도움은 단계별 사용자당 5회까지 사용할 수 있습니다.';
+    const currentStage = stages[state.currentStage];
+    const usedCurrent = usage[currentStage.id] || 0;
+    $('aiGate').textContent = usedCurrent >= 5
+      ? `${currentStage.label}에서 AI 도움 기회를 모두 활용하였습니다.`
+      : 'AI 도움은 단계별 사용자당 5회까지 사용할 수 있습니다.';
+    $('aiGate').className = `mt-4 rounded-2xl border border-dashed p-4 text-sm leading-6 ${usedCurrent >= 5 ? 'border-rose/40 bg-rose/10 text-rose' : 'border-violet/30 bg-purple-50 text-violet'}`;
     const latest = (state.projectState.aiFeed || [])[0];
     $('aiFeed').innerHTML = latest
       ? `<article class="rounded-2xl bg-white p-4 text-sm leading-6 shadow-soft"><strong class="text-violet">AI</strong><p class="mt-2 whitespace-pre-wrap text-muted">${escapeHtml(compactAiText(latest.text))}</p></article>`
@@ -518,10 +525,11 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderArtifactTimeline() {
     const revisions = state.projectState.revisions || [];
     $('artifactTimeline').innerHTML = revisions.slice(0, 6).map((revision) => `
-      <button class="relative z-10 rounded-2xl bg-white p-3 text-center shadow-insetLine" data-version="${escapeHtml(revision.version)}" data-version-note="${escapeHtml(revision.note)}">
-        <div class="mx-auto grid h-8 w-8 place-items-center rounded-full bg-ink text-white"><i data-lucide="git-commit-horizontal" class="h-4 w-4"></i></div>
-        <p class="mt-2 text-xs font-bold">${escapeHtml(revision.version)}</p>
-        <p class="mt-1 text-[11px] text-muted">${escapeHtml(revision.by)} · Δ${revision.delta}</p>
+      <button class="rounded-2xl bg-white p-3 text-left shadow-insetLine" data-version="${escapeHtml(revision.version)}" data-version-note="${escapeHtml(revision.note)}">
+        <div class="flex items-center gap-3">
+          <span class="grid h-8 w-8 place-items-center rounded-full bg-ink text-white"><i data-lucide="git-commit-horizontal" class="h-4 w-4"></i></span>
+          <span><strong class="block text-sm">${escapeHtml(revision.version)}</strong><span class="text-[11px] text-muted">${escapeHtml(revision.by)} · Δ${revision.delta}</span></span>
+        </div>
       </button>
     `).join('') || emptyCard('아직 산출물 수정 기록이 없습니다.');
   }
@@ -556,20 +564,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderTeacherDetail() {
     const team = state.projectState.teams?.find((item) => item.name === state.selectedTeacherTeam) || state.projectState.teams?.[0];
-    const notes = (state.projectState.notes || []).filter((note) => note.teamId === team?.name);
+    const detailStage = state.teacherDetailStage || team?.currentStage || 'problem_exploration';
+    const notes = (state.projectState.notes || []).filter((note) => note.teamId === team?.name && note.stage === detailStage);
     const ai = (state.projectState.aiFeed || []).slice(0, 4);
-    const events = (state.projectState.events || []).filter((event) => event.teamId === team?.name).slice(0, 5);
+    const events = (state.projectState.events || []).filter((event) => event.teamId === team?.name && event.cpsStage === detailStage).slice(0, 5);
     $('teacherTeamDetail').innerHTML = team ? `
-      <div class="rounded-[26px] bg-ink p-5 text-white">
-        <div class="flex items-center justify-between"><h3 class="text-xl font-semibold">${team.name} 미니 보기</h3><span>${team.temperature}°C</span></div>
-        <p class="mt-2 text-sm text-slate-300">현재 단계: ${stageName(team.currentStage)}</p>
-        <div class="mt-4 grid gap-3 md:grid-cols-2">
-          <div class="rounded-2xl bg-white/10 p-4"><strong>작성 중인 아이디어</strong><p class="mt-2 text-sm text-slate-300">${notes.filter((n) => n.mode === 'divergence').slice(0, 3).map((n) => escapeHtml(n.text)).join('<br>') || '없음'}</p></div>
-          <div class="rounded-2xl bg-white/10 p-4"><strong>수렴 결과</strong><p class="mt-2 text-sm text-slate-300">${notes.filter((n) => n.mode === 'convergence').slice(0, 3).map((n) => escapeHtml(n.text)).join('<br>') || '없음'}</p></div>
-          <div class="rounded-2xl bg-white/10 p-4"><strong>AI 도움</strong><p class="mt-2 text-sm text-slate-300">${ai.map((a) => formatTime(a.timestamp)).join(', ') || '없음'}</p></div>
-          <div class="rounded-2xl bg-white/10 p-4"><strong>최근 로그</strong><p class="mt-2 text-sm text-slate-300">${events.map((e) => eventName(e.eventType)).join('<br>') || '없음'}</p></div>
+      <div>
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div><h3 class="text-xl font-semibold">${team.name} 학습자 화면 보기</h3><p class="mt-1 text-sm text-muted">현재 단계: ${stageName(team.currentStage)}</p></div>
+          <span class="rounded-full bg-yellow-200 px-3 py-1 text-xs font-bold text-ink">협동 온도 ${team.temperature}°C</span>
         </div>
-        <div class="mt-4 rounded-2xl bg-white/10 p-4">
+        <div class="board-grid mt-4 rounded-[26px] border border-line bg-white p-4">
+          <div class="flex flex-wrap gap-2">${stages.map((stage) => `<button class="rounded-xl px-3 py-2 text-xs font-bold ${stage.id === detailStage ? 'bg-ink text-white' : 'bg-paper text-muted'}" data-teacher-stage="${stage.id}">${stage.label}</button>`).join('')}</div>
+          <div class="mt-4 grid gap-4 lg:grid-cols-2">
+            <section class="rounded-[22px] border border-yellow-300 bg-yellow-50 p-4">
+              <h4 class="font-semibold">발산 공간</h4>
+              <div class="mt-3 grid gap-3">${notes.filter((n) => n.mode === 'divergence').slice(0, 6).map(renderTeacherNoteCard).join('') || '<p class="text-sm text-muted">작성된 카드가 없습니다.</p>'}</div>
+            </section>
+            <section class="rounded-[22px] border border-teal-300 bg-teal-50 p-4">
+              <h4 class="font-semibold">수렴 공간</h4>
+              <div class="mt-3 grid gap-3">${notes.filter((n) => n.mode === 'convergence').slice(0, 6).map(renderTeacherNoteCard).join('') || '<p class="text-sm text-muted">정리된 카드가 없습니다.</p>'}</div>
+            </section>
+          </div>
+          <div class="mt-4 grid gap-3 md:grid-cols-2">
+            <div class="rounded-2xl bg-white p-4 shadow-insetLine"><strong>AI 도움 사용 내역</strong><p class="mt-2 text-sm text-muted">${ai.map((a) => `${stageName(a.stage)} · ${formatTime(a.timestamp)}`).join('<br>') || '없음'}</p></div>
+            <div class="rounded-2xl bg-white p-4 shadow-insetLine"><strong>최근 이벤트 로그</strong><p class="mt-2 text-sm text-muted">${events.map((e) => `${eventName(e.eventType)} · ${formatTime(e.timestamp)}`).join('<br>') || '없음'}</p></div>
+          </div>
+        </div>
+        <div class="mt-4 rounded-2xl bg-ink p-4 text-white">
           <strong>교수자 피드백 입력</strong>
           <div class="mt-3 grid gap-2 md:grid-cols-[160px_1fr_auto]">
             <select id="teacherFeedbackStage" class="rounded-xl border border-white/20 bg-white px-3 py-2 text-sm text-ink">
@@ -581,6 +603,13 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
       </div>` : '';
+  }
+
+  function renderTeacherNoteCard(note) {
+    return `<article class="rounded-2xl bg-white p-3 text-sm leading-6 shadow-insetLine">
+      <p class="font-semibold text-slate-800">${escapeHtml(note.text)}</p>
+      <div class="mt-2 flex justify-between border-t border-slate-100 pt-2 text-xs text-muted"><span>${escapeHtml(note.author)}</span><span>${formatTime(note.timestamp)}</span></div>
+    </article>`;
   }
 
   function renderAiVisualization() {
@@ -595,8 +624,32 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderRoster() {
-    $('studentRosterCount').textContent = `${state.projectState.roster?.length || 0}명`;
-    $('studentRosterList').innerHTML = (state.projectState.roster || []).map((student) => `<article class="rounded-2xl bg-paper p-4"><h3 class="font-semibold">${escapeHtml(student.name)} ${badges(student.badges)}</h3><p class="mt-2 text-xs text-muted">${student.team} · 이벤트 ${student.eventCount}개 · 분당 ${student.rate.toFixed(2)}개</p></article>`).join('');
+    const roster = sortedRoster();
+    $('studentRosterCount').textContent = `${roster.length}명`;
+    $('studentRosterList').innerHTML = `
+      <div class="grid grid-cols-[1.1fr_.7fr_.7fr_.7fr_.7fr] gap-2 border-b border-line bg-paper px-4 py-3 text-xs font-bold text-muted">
+        <span>이름</span><span>팀</span><span>접속</span><span>이벤트</span><span>분당</span>
+      </div>
+      ${roster.map((student) => `<div class="grid grid-cols-[1.1fr_.7fr_.7fr_.7fr_.7fr] gap-2 border-b border-line/60 px-4 py-3 text-sm">
+        <span class="font-semibold">${escapeHtml(student.name)} ${badges(student.badges)}</span>
+        <span>${escapeHtml(student.team)}</span>
+        <span class="${student.online ? 'text-teal font-bold' : 'text-muted'}">${student.online ? '접속중' : '오프라인'}</span>
+        <span>${student.eventCount}개</span>
+        <span>${student.rate.toFixed(2)}개</span>
+      </div>`).join('')}
+    `;
+  }
+
+  function sortedRoster() {
+    const roster = [...(state.projectState.roster || [])];
+    const sorters = {
+      name: (a, b) => a.name.localeCompare(b.name, 'ko'),
+      team: (a, b) => a.team.localeCompare(b.team, 'ko') || a.name.localeCompare(b.name, 'ko'),
+      event: (a, b) => b.eventCount - a.eventCount || a.name.localeCompare(b.name, 'ko'),
+      rate: (a, b) => b.rate - a.rate || a.name.localeCompare(b.name, 'ko'),
+      online: (a, b) => Number(b.online) - Number(a.online) || a.name.localeCompare(b.name, 'ko')
+    };
+    return roster.sort(sorters[state.rosterSort] || sorters.name);
   }
 
   function renderEvents() {
@@ -711,18 +764,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function saveDecisionMatrix() {
+    const criteria = [...document.querySelectorAll('.criteria-input')].map((input, index) => input.value.trim() || `준거 ${index + 1}`);
     const rows = [...document.querySelectorAll('[data-matrix-note]')].map((row) => {
-      const scores = [...row.querySelectorAll('.matrix-score')].map((input) => Number(input.value || 0));
+      const scores = [...row.querySelectorAll('.matrix-score')].map((input) => Math.max(0, Math.min(5, Number(input.value || 0))));
       return { noteId: row.dataset.matrixNote, scores, total: scores.reduce((a, b) => a + b, 0) };
     });
     const picked = rows.slice().sort((a, b) => b.total - a.total)[0]?.noteId;
-    state.projectState = (await api(`/api/projects/${state.currentProject.id}/decision`, { method: 'POST', body: JSON.stringify({ stage: 'idea_generation', matrix: rows, selectedNoteId: picked }) })).state;
+    state.projectState = (await api(`/api/projects/${state.currentProject.id}/decision`, { method: 'POST', body: JSON.stringify({ stage: 'idea_generation', criteria, matrix: rows, selectedNoteId: picked }) })).state;
     renderAll();
   }
 
   function recalcMatrix() {
     document.querySelectorAll('[data-matrix-note]').forEach((row) => {
-      const total = [...row.querySelectorAll('.matrix-score')].reduce((sum, input) => sum + Number(input.value || 0), 0);
+      const total = [...row.querySelectorAll('.matrix-score')].reduce((sum, input) => {
+        const clamped = Math.max(0, Math.min(5, Number(input.value || 0)));
+        if (input.value && Number(input.value) !== clamped) input.value = clamped;
+        return sum + clamped;
+      }, 0);
       row.querySelector('.matrix-total').textContent = total;
     });
   }
@@ -752,7 +810,18 @@ document.addEventListener('DOMContentLoaded', () => {
   $('loginPassword').addEventListener('keydown', (event) => { if (event.key === 'Enter') login(); });
   $('createProjectBtn').addEventListener('click', () => $('createProjectPanel').classList.toggle('hidden'));
   $('saveProjectBtn').addEventListener('click', createProject);
-  $('expandCanvasBtn').addEventListener('click', () => { state.canvasExpanded = !state.canvasExpanded; renderAll(); });
+  $('joinProjectBtn').addEventListener('click', joinProjectByCode);
+  $('backToProjects').addEventListener('click', async () => {
+    if (state.stream) state.stream.close();
+    if (state.heartbeat) clearInterval(state.heartbeat);
+    await loadProjects();
+    renderProjectScreen();
+    showScreen('projectScreen');
+  });
+  $('rosterSort').addEventListener('change', (event) => {
+    state.rosterSort = event.target.value;
+    renderRoster();
+  });
   $('phaseDivergeBtn').addEventListener('click', () => { state.activePhase = 'divergence'; logEvent('button_clicked', { target: 'divergence_tab' }, 'divergence'); renderAll(); });
   $('phaseConvergeBtn').addEventListener('click', () => { state.activePhase = 'convergence'; logEvent('button_clicked', { target: 'convergence_tab' }, 'convergence'); renderAll(); });
   $('addDivergence').addEventListener('click', () => addNote('divergence'));
@@ -765,7 +834,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const noteButton = event.target.closest('[data-note-action]');
     if (noteButton) noteAction(noteButton.dataset.noteAction, noteButton.dataset.noteId);
     const teamButton = event.target.closest('[data-team-view]');
-    if (teamButton) { state.selectedTeacherTeam = teamButton.dataset.teamView; renderTeacherDetail(); }
+    if (teamButton) { state.selectedTeacherTeam = teamButton.dataset.teamView; state.teacherDetailStage = null; renderTeacherDetail(); }
+    const teacherStageButton = event.target.closest('[data-teacher-stage]');
+    if (teacherStageButton) { state.teacherDetailStage = teacherStageButton.dataset.teacherStage; renderTeacherDetail(); }
+    const shareButton = event.target.closest('[data-share-project]');
+    if (shareButton) shareProjectCode(shareButton.dataset.shareProject);
     const promptButton = event.target.closest('[data-fill-prompt]');
     if (promptButton) $(state.activePhase === 'convergence' ? 'convergenceInput' : 'divergenceInput').value = promptButton.dataset.fillPrompt;
     const versionButton = event.target.closest('[data-version]');
@@ -802,6 +875,32 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!feedback) return;
     await logEvent('teacher_feedback', { teamName, feedback }, 'convergence', stage);
     input.value = '';
+  }
+
+  async function shareProjectCode(projectId) {
+    const data = await api(`/api/projects/${projectId}/share-code`, { method: 'POST' });
+    await loadProjects();
+    renderProjectScreen();
+    window.alert(`프로젝트 코드: ${data.project.shareCode}`);
+  }
+
+  async function joinProjectByCode() {
+    const code = $('joinProjectCode').value.trim();
+    const message = $('joinProjectMessage');
+    if (!code) return;
+    try {
+      const data = await api('/api/projects/join', { method: 'POST', body: JSON.stringify({ code }) });
+      message.textContent = `${data.project.name} 프로젝트가 추가되었습니다.`;
+      message.className = 'mt-3 text-sm font-bold text-teal';
+      message.classList.remove('hidden');
+      $('joinProjectCode').value = '';
+      await loadProjects();
+      renderProjectScreen();
+    } catch (error) {
+      message.textContent = error.message;
+      message.className = 'mt-3 text-sm font-bold text-rose';
+      message.classList.remove('hidden');
+    }
   }
 
   iconRefresh();
