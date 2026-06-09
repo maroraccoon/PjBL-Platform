@@ -4,7 +4,9 @@
   "private": true,
   "description": "Local-network PjBL collaboration demo with shared project state.",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "demo:ffmpeg": "npx.cmd playwright install ffmpeg",
+    "demo:video": "node tools/generate-demo-video.mjs"
   },
   "engines": {
     "node": ">=18"

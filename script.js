@@ -542,8 +542,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderTeamAwareness() {
     const team = state.projectState.teams?.find((item) => item.name === state.user.team) || state.projectState.teams?.[0];
     $('studentAwarenessList').innerHTML = (team?.members || []).map((member) => `<div class="flex items-center justify-between rounded-xl bg-paper p-3 text-sm"><span>${escapeHtml(member.name)} ${badges(member.badges)}</span><strong>${member.eventCount}</strong></div>`).join('');
-    $('studentBalanceRatio').textContent = `${team?.temperature || 32}°C`;
-    $('studentBalanceBar').innerHTML = `<div class="bg-teal" style="width:${Math.min(100, ((team?.temperature || 32) - 30) * 10)}%"></div>`;
+    $('studentBalanceRatio').textContent = `${team?.temperature || 36.5}°C`;
+    $('studentBalanceBar').innerHTML = `<div class="bg-teal" style="width:${Math.min(100, ((team?.temperature || 36.5) - 36.5) / 12 * 100)}%"></div>`;
   }
 
   function renderArtifactTimeline() {
@@ -563,7 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const teams = state.projectState.teams || [];
     const active = teams.filter((team) => team.active).length;
     const aiTotal = teams.reduce((sum, team) => sum + team.aiTotal, 0);
-    const avgTemp = teams.length ? (teams.reduce((sum, team) => sum + team.temperature, 0) / teams.length).toFixed(1) : '32.0';
+    const avgTemp = teams.length ? (teams.reduce((sum, team) => sum + team.temperature, 0) / teams.length).toFixed(1) : '36.5';
     $('metricEvents').textContent = teams.length;
     $('metricUnlock').textContent = active;
     $('metricRatio').textContent = `${avgTemp}°C`;
@@ -691,7 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.charts.temperature = new Chart($('memberChart'), {
       type: 'bar',
       data: { labels: teams.map((t) => t.name), datasets: [{ label: '협동 온도', data: teams.map((t) => t.temperature), backgroundColor: '#facc15' }] },
-      options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, max: 45 } } }
+      options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true, max: 50 } } }
     });
     state.charts.ai = new Chart($('ratioChart'), {
       type: 'doughnut',

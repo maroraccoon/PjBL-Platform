@@ -133,7 +133,7 @@ function createDefaultStore() {
   };
   const fresh = { meta: { eventSeq: 0, noteSeq: seedNotes.length, revisionSeq: 4 }, projects, states: { 'project-1': state, 'project-2': emptyProjectState(), 'project-3': emptyProjectState() } };
   state.notes.forEach((note) => {
-    const user = allUsers().find((u) => u.id === note.actorId) || demoUsers[1];
+    const user = demoUsers.find((u) => u.id === note.actorId) || demoUsers[1];
     fresh.meta.eventSeq += 1;
     state.events.unshift({
       eventId: `evt-${String(fresh.meta.eventSeq).padStart(4, '0')}`,
@@ -350,7 +350,7 @@ function teamStats(team, state, roster) {
   const mean = total / Math.max(1, counts.length);
   const variance = counts.reduce((sum, value) => sum + Math.abs(value - mean), 0) / Math.max(1, counts.length);
   const balance = total ? Math.max(0, 1 - variance / Math.max(1, mean + 1)) : 0;
-  const temperature = Number((32 + balance * 8 + Math.min(4, total / 10)).toFixed(1));
+  const temperature = Number((36.5 + balance * 8 + Math.min(4, total / 10)).toFixed(1));
   return {
     name: team,
     eventCount: events.length,
