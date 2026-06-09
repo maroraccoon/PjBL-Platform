@@ -541,7 +541,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderTeamAwareness() {
     const team = state.projectState.teams?.find((item) => item.name === state.user.team) || state.projectState.teams?.[0];
-    $('studentAwarenessList').innerHTML = (team?.members || []).map((member) => `<div class="flex items-center justify-between rounded-xl bg-paper p-3 text-sm"><span>${escapeHtml(member.name)} ${badges(member.badges)}</span><strong>${member.eventCount}</strong></div>`).join('');
+    $('studentAwarenessList').innerHTML = (team?.members || []).map((member) => `
+      <div class="rounded-xl bg-paper p-3 text-sm">
+        <span class="flex flex-wrap items-center gap-1.5">
+          <strong class="mr-1 font-medium">${escapeHtml(member.name)}</strong>
+          ${badges(member.badges)}
+        </span>
+      </div>
+    `).join('');
     $('studentBalanceRatio').textContent = `${team?.temperature || 36.5}°C`;
     $('studentBalanceBar').innerHTML = `<div class="bg-teal" style="width:${Math.min(100, ((team?.temperature || 36.5) - 36.5) / 12 * 100)}%"></div>`;
   }
@@ -810,8 +817,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function badges(values = []) {
-    const map = { idea: '💡', empathy: '❤️', explorer: '🔍', connector: '🔗', listener: '👂' };
-    return values.map((value) => map[value] || '').join('');
+    const map = {
+      idea: { emoji: '💡', title: '아이디어 뱅크', text: '새로운 아이디어 카드를 활발하게 만들었어요.' },
+      empathy: { emoji: '❤️', title: '공감 요정', text: '좋아요와 답글로 팀원의 생각에 적극적으로 반응했어요.' },
+      explorer: { emoji: '🔍', title: '탐구가', text: '긴 글과 수정 활동으로 생각을 깊게 발전시켰어요.' },
+      connector: { emoji: '🔗', title: '커넥터', text: '질문과 답글로 서로 다른 생각을 연결했어요.' },
+      listener: { emoji: '👂', title: '경청자', text: '팀의 카드와 활동을 꾸준히 살펴보며 흐름을 따라갔어요.' }
+    };
+    return values.slice(0, 3).map((value) => {
+      const badge = map[value];
+      if (!badge) return '';
+      return `<span class="group relative inline-flex cursor-help items-center" tabindex="0" aria-label="${badge.title}: ${badge.text}">
+        <span class="text-base leading-none">${badge.emoji}</span>
+        <span class="pointer-events-none absolute bottom-full left-0 z-40 mb-2 hidden w-52 rounded-xl bg-ink px-3 py-2 text-left text-xs font-normal leading-5 text-white shadow-soft group-hover:block group-focus:block">
+          <strong class="block font-bold">${badge.title}</strong>${badge.text}
+        </span>
+      </span>`;
+    }).join('');
   }
 
   function emptyCard(text) {
